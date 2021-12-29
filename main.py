@@ -21,7 +21,20 @@ entry_result = cv.bitwise_and(parkingLot, parkingLot, mask=entry_mask)
 
 blend1 = cv.addWeighted(boundary_result, 1, parkingSpot_result, 1, 0)
 blend2 = cv.addWeighted(blend1, 1, entry_result, 1, 0)
-cv.imshow('Parking Lot', blend2)
 
-cv.waitKey(0)
-cv.destroyAllWindows()
+# Get X and Y coordinates of lines
+x_boundary, y_boundary = np.where(np.all(boundary_result != [0, 0, 0], axis=2))
+x_parkingSpot, y_parkingSpot = np.where(np.all(parkingSpot_result != [0, 0, 0], axis=2))
+x_entry, y_entry = np.where(np.all(entry_result != [0, 0, 0], axis=2))
+boundary_coordinates = np.column_stack((x_boundary, y_boundary))
+parkingSpot_coordinates = np.column_stack((x_parkingSpot, y_parkingSpot))
+entry_coordinates = np.column_stack((x_entry, y_entry))
+np.savetxt('boundary_coordinates', boundary_coordinates)
+np.savetxt('parkingSpot_coordinates', parkingSpot_coordinates)
+np.savetxt('entry_coordinates', entry_coordinates)
+
+cv.imwrite('Edited Parking Lot.jpg', blend2)
+
+# cv.imshow('Parking Lot', blend2)
+# cv.waitKey(0)
+# cv.destroyAllWindows()
