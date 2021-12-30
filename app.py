@@ -4,6 +4,36 @@
 # 3) Use color gradient show where snow is being pilled up
 
 import pygame
+import pandas as pd
+
+
+class ParkingLotBorders:
+    def __init__(self, parent_screen):
+        self.parent_screen = parent_screen
+        self.boundary_coordinates = pd.read_csv(r'C:\Users\amind\PycharmProjects\Automated Parking Lot Snow Removal\boundary_coordinates.csv')
+        self.parkingSpot_coordinates = pd.read_csv(r'C:\Users\amind\PycharmProjects\Automated Parking Lot Snow Removal\parkingSpot_coordinates.csv')
+        self.entry_coordinates = pd.read_csv(r'C:\Users\amind\PycharmProjects\Automated Parking Lot Snow Removal\entry_coordinates.csv')
+
+    def place_boundaries(self):
+        blue = [0,   0, 255]
+        for i in self.boundary_coordinates['0']:
+            x = self.boundary_coordinates['0'][i]
+            y = self.boundary_coordinates['1'][i]
+            pygame.draw.circle(self.parent_screen, blue, [x, y], 1)
+
+    def place_parkingspots(self):
+        red = [255,   0,   0]
+        for i in self.parkingSpot_coordinates['0']:
+            x = self.parkingSpot_coordinates['0'][i]
+            y = self.parkingSpot_coordinates['1'][i]
+            pygame.draw.circle(self.parent_screen, red, [x, y], 1)
+
+    def place_entries(self):
+        green = [0, 255,   0]
+        for i in self.entry_coordinates['0']:
+            x = self.entry_coordinates['0'][i]
+            y = self.entry_coordinates['1'][i]
+            pygame.draw.circle(self.parent_screen, green, [x, y], 1)
 
 
 class Snowplow:
@@ -25,6 +55,7 @@ class Display:
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
         self.screen.blit(self.background_image, [0, 0])
         self.snowplow = Snowplow(self.screen)
+        self.ParkingLotBorders = ParkingLotBorders(self.screen)
 
     def run(self):
         running = True
@@ -43,10 +74,12 @@ class Display:
                 self.snowplow.place_snowplow(x_coor, y_coor)
             except NameError:  # Bypass NameError that occurs if mouse isn't clicked and variables x_coor/y-coor aren't created for snowplow() function
                 pass
+            self.ParkingLotBorders.place_boundaries()
+            self.ParkingLotBorders.place_parkingspots()
+            self.ParkingLotBorders.place_entries()
             pygame.display.flip()
 
 
 if __name__ == '__main__':
     display = Display()
     display.run()
-

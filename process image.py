@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import pandas as pd
 
 parkingLot = cv.imread('Labelled Parking Lot.jpg')
 parkingLot_hsv = cv.cvtColor(parkingLot, cv.COLOR_RGB2HSV)
@@ -33,9 +34,12 @@ x_entry, y_entry = np.where(np.all(entry_result != [0, 0, 0], axis=2))
 boundary_coordinates = np.column_stack((x_boundary, y_boundary))
 parkingSpot_coordinates = np.column_stack((x_parkingSpot, y_parkingSpot))
 entry_coordinates = np.column_stack((x_entry, y_entry))
-np.savetxt('boundary_coordinates', boundary_coordinates)
-np.savetxt('parkingSpot_coordinates', parkingSpot_coordinates)
-np.savetxt('entry_coordinates', entry_coordinates)
+df_boundary = pd.DataFrame(boundary_coordinates)
+df_parkingSpot = pd.DataFrame(parkingSpot_coordinates)
+df_entry = pd.DataFrame(entry_coordinates)
+df_boundary.to_csv('boundary_coordinates.csv', index=False)
+df_parkingSpot.to_csv('parkingSpot_coordinates.csv', index=False)
+df_entry.to_csv('entry_coordinates.csv', index=False)
 
 # Save final edited image
 cv.imwrite('Edited Parking Lot.jpg', blend2)
