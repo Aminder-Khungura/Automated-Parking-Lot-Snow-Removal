@@ -1,6 +1,5 @@
 import cv2 as cv
 import numpy as np
-import pandas as pd
 
 parkingLot = cv.imread('Labelled Parking Lot.jpg')
 parkingLot_hsv = cv.cvtColor(parkingLot, cv.COLOR_RGB2HSV)
@@ -28,22 +27,23 @@ blend1 = cv.addWeighted(boundary_result, 1, parkingSpot_result, 1, 0)
 blend2 = cv.addWeighted(blend1, 1, entry_result, 1, 0)
 
 # Get X and Y coordinates of lines
-x_boundary, y_boundary = np.where(np.all(boundary_result != [0, 0, 0], axis=2))
-x_parkingSpot, y_parkingSpot = np.where(np.all(parkingSpot_result != [0, 0, 0], axis=2))
-x_entry, y_entry = np.where(np.all(entry_result != [0, 0, 0], axis=2))
-boundary_coordinates = np.column_stack((x_boundary, y_boundary))
-parkingSpot_coordinates = np.column_stack((x_parkingSpot, y_parkingSpot))
-entry_coordinates = np.column_stack((x_entry, y_entry))
-df_boundary = pd.DataFrame(boundary_coordinates)
-df_parkingSpot = pd.DataFrame(parkingSpot_coordinates)
-df_entry = pd.DataFrame(entry_coordinates)
-df_boundary.to_csv('boundary_coordinates.csv', index=False)
-df_parkingSpot.to_csv('parkingSpot_coordinates.csv', index=False)
-df_entry.to_csv('entry_coordinates.csv', index=False)
+# x_boundary, y_boundary = np.where(np.all(boundary_result != [0, 0, 0], axis=2))
+# x_parkingSpot, y_parkingSpot = np.where(np.all(parkingSpot_result != [0, 0, 0], axis=2))
+# x_entry, y_entry = np.where(np.all(entry_result != [0, 0, 0], axis=2))
+# boundary_coordinates = np.column_stack((x_boundary, y_boundary))
+# parkingSpot_coordinates = np.column_stack((x_parkingSpot, y_parkingSpot))
+# entry_coordinates = np.column_stack((x_entry, y_entry))
+
+# Clean up final image before saving
+kernel_erode = np.ones((2, 2), np.uint8)
+kernel_close = np.ones((15, 15), np.uint8)
+erode = cv.erode(blend2, kernel_erode)
+closing = cv.morphologyEx(erode, cv.MORPH_CLOSE, kernel_close)
+
 
 # Save final edited image
-cv.imwrite('Edited Parking Lot.jpg', blend2)
+cv.imwrite('Edited Parking Lot.jpg', closing)
 
-# cv.imshow('Parking Lot', blend2)
+# cv.imshow('Parking Lot', closing)
 # cv.waitKey(0)
 # cv.destroyAllWindows()
