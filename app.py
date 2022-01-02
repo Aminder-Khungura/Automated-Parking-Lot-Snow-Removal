@@ -35,7 +35,7 @@ class Display:
         # Convert from (width, height, channel) to (height, width, channel)
         view = view.transpose([1, 0, 2])
         img_bgr = cv.cvtColor(view, cv.COLOR_RGB2BGR)
-        y_boundary, x_boundary,  = np.where(np.all(img_bgr != [0,   0, 0], axis=2))
+        y_boundary, x_boundary = np.where(np.all(img_bgr != [0,   0, 0], axis=2))
         for i in x_boundary:
             pygame.draw.circle(self.screen, [0,   0, 255], [x_boundary[i], y_boundary[i]], 1)
 
