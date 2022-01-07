@@ -71,6 +71,15 @@ class Display:
             y_parkingspot, x_parkingspot = np.where(np.all(parkingspot_closing != [0, 0, 0], axis=2))
             y_entry, x_entry = np.where(np.all(entry_closing != [0, 0, 0], axis=2))
 
+            # for i in range(len(x_boundary)):
+            #     pygame.draw.circle(self.screen, [0, 0, 255], [x_boundary[i], y_boundary[i]], 1)
+            # for i in range(len(x_parkingspot)):
+            #     pygame.draw.circle(self.screen, [255, 0, 0], [x_parkingspot[i], y_parkingspot[i]], 1)
+            # for i in range(len(x_entry)):
+            #     pygame.draw.circle(self.screen, [0, 255, 0], [x_entry[i], y_entry[i]], 1)
+
+            # img_hsv[np.where((img_hsv == [0, 0, 0]).all(axis=2))] = [255, 255, 255]
+
     def run(self):
         running = True
         loop_counter = 1
