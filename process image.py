@@ -34,6 +34,9 @@ blend2 = cv.addWeighted(blend1, 1, entry_result, 1, 0)
 
 # Save final edited image
 pic_RGB = cv.cvtColor(blend2, cv.COLOR_HSV2RGB)
+# image_center = tuple(np.array(pic_RGB.shape[1::-1]) / 2)
+# rot_mat = cv.getRotationMatrix2D(image_center, -35, 1.0)
+# result = cv.warpAffine(pic_RGB, rot_mat, pic_RGB.shape[1::-1], flags=cv.INTER_LINEAR)
 cv.imwrite('Edited Parking Lot.jpg', pic_RGB)
 
 # cv.imshow('Parking Lot', closing)

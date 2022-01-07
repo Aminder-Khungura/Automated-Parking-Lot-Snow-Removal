@@ -21,16 +21,29 @@ class Snowplow:
         self.running = True
         # create algorithm that controls snowplow's movement to maximize the amount of snow collected
         # add small snowflake images to background that will be collected by snowplow when position overlaps pics
+
+
+class Snowflake:
+    def __init__(self, parent_screen):
+        self.parent_screen = parent_screen
+        self.snowflake = pygame.image.load('snowflake 64.png').convert()
+        self.snowflake = pygame.transform.scale(self.snowflake, (35, 35))
+        self.parent_screen.blit(self.snowflake, [0, 0])
+
+
 class Display:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1000, 1000))
+        self.screen = pygame.display.set_mode((987, 964))
         pygame.display.set_caption("Snowplow Visualization")
         self.icon = pygame.image.load('snowplow.png')
         pygame.display.set_icon(self.icon)
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
         self.screen.blit(self.background_image, [0, 0])
         self.snowplow = Snowplow(self.screen)
+        self.gridblock_width = 1000 // 30
+        self.gridblock_height = 1000 // 30
+        self.snowflake = Snowflake(self.screen)
 
     def parkinglot_barriers(self, loop_counter):
         # Convert windowSurface to cv2 Reference: https://stackoverflow.com/questions/19240422/display-cv2-videocapture-image-inside-pygame-surface
@@ -74,6 +87,13 @@ class Display:
             y_parkingspot, x_parkingspot = np.where(np.all(parkingspot_closing != [0, 0, 0], axis=2))
             y_entry, x_entry = np.where(np.all(entry_closing != [0, 0, 0], axis=2))
 
+    def draw_grid(self):
+        for i in range(1000 // self.gridblock_width):
+            pygame.draw.line(self.screen, [255, 255, 255], (i * self.gridblock_width, 0), (i * self.gridblock_width, 1000))
+
+        for i in range(1000 // self.gridblock_height):
+            pygame.draw.line(self.screen, [255, 255, 255], (0, i * self.gridblock_height), (1000, i * self.gridblock_height))
+
     def run(self):
         running = True
         loop_counter = 1
@@ -102,6 +122,7 @@ class Display:
                     self.snowplow.place_snowplow(x_coor, y_coor)
 
                 self.parkinglot_barriers(loop_counter)
+                self.draw_grid()
                 loop_counter += 1
             pygame.display.flip()
 
