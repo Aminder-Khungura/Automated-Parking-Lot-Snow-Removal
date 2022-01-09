@@ -6,6 +6,7 @@
 import pygame
 import cv2 as cv
 import numpy as np
+import hard_coded_values as HCV
 
 
 class Snowplow:
@@ -13,7 +14,14 @@ class Snowplow:
         self.parent_screen = parent_screen
         self.snowplow_character = pygame.image.load('snowplow_character.png')
 
-    def place_snowplow(self, x, y):
+    @staticmethod
+    def get_click_pos():
+        x_coor, y_coor = pygame.mouse.get_pos()
+        x_coor -= HCV.snowplow_img_offset
+        y_coor -= HCV.snowplow_img_offset
+        return x_coor, y_coor
+
+    def draw_snowplow(self, x, y):
         self.parent_screen.blit(self.snowplow_character, [x, y])
         pygame.display.flip()
 
@@ -26,26 +34,30 @@ class Snowplow:
 class Snowflake:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
-        self.snowflake = pygame.image.load('snowflake 64.png').convert()
-        self.snowflake = pygame.transform.scale(self.snowflake, (35, 35))
+        self.snowflake = pygame.image.load('snowflake.png').convert()
+        self.snowflake = pygame.transform.scale(self.snowflake, (HCV.x_transform, HCV.y_transform))
         self.parent_screen.blit(self.snowflake, [0, 0])
+
+    def draw_snowflake(self, pos):
+        self.grid_pos = pos
+        self.pix_pos
 
 
 class Display:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((987, 964))
+        self.screen = pygame.display.set_mode((HCV.screen_width, HCV.screen_height))
         pygame.display.set_caption("Snowplow Visualization")
         self.icon = pygame.image.load('snowplow.png')
         pygame.display.set_icon(self.icon)
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
         self.screen.blit(self.background_image, [0, 0])
         self.snowplow = Snowplow(self.screen)
-        self.gridblock_width = 1000 // 30
-        self.gridblock_height = 1000 // 30
+        self.gridblock_width = HCV.screen_width // HCV.pixels_per_block
+        self.gridblock_height = HCV.screen_height // HCV.pixels_per_block
         self.snowflake = Snowflake(self.screen)
 
-    def parkinglot_barriers(self, loop_counter):
+    def get_barrier_coordinates(self, loop_counter):
         # Convert windowSurface to cv2 Reference: https://stackoverflow.com/questions/19240422/display-cv2-videocapture-image-inside-pygame-surface
         view = pygame.surfarray.array3d(self.screen)
         # Convert from (width, height, channel) to (height, width, channel)
@@ -83,16 +95,16 @@ class Display:
             entry_erode = cv.erode(entry_result, kernel_erode)
             entry_closing = cv.morphologyEx(entry_erode, cv.MORPH_CLOSE, kernel_close)
 
-            y_boundary, x_boundary = np.where(np.all(boundary_closing != [0, 0, 0], axis=2))
-            y_parkingspot, x_parkingspot = np.where(np.all(parkingspot_closing != [0, 0, 0], axis=2))
-            y_entry, x_entry = np.where(np.all(entry_closing != [0, 0, 0], axis=2))
+            y_boundary, x_boundary = np.where(np.all(boundary_closing != HCV.black, axis=2))
+            y_parkingspot, x_parkingspot = np.where(np.all(parkingspot_closing != HCV.black, axis=2))
+            y_entry, x_entry = np.where(np.all(entry_closing != HCV.black, axis=2))
 
     def draw_grid(self):
-        for i in range(1000 // self.gridblock_width):
-            pygame.draw.line(self.screen, [255, 255, 255], (i * self.gridblock_width, 0), (i * self.gridblock_width, 1000))
+        for i in range(HCV.screen_width // self.gridblock_width):
+            pygame.draw.line(self.screen, HCV.white, (i * self.gridblock_width, 0), (i * self.gridblock_width, HCV.screen_width))
 
-        for i in range(1000 // self.gridblock_height):
-            pygame.draw.line(self.screen, [255, 255, 255], (0, i * self.gridblock_height), (1000, i * self.gridblock_height))
+        for i in range(HCV.screen_height // self.gridblock_height):
+            pygame.draw.line(self.screen, HCV.white, (0, i * self.gridblock_height), (HCV.screen_height, i * self.gridblock_height))
 
     def run(self):
         running = True
@@ -103,25 +115,23 @@ class Display:
                     running = False
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    x_coor, y_coor = pygame.mouse.get_pos()
-                    x_coor -= 30
-                    y_coor -= 30
+                    x_coor, y_coor = self.snowplow.get_click_pos()
                     self.screen.blit(self.background_image, [0, 0])
-                    self.snowplow.place_snowplow(x_coor, y_coor)
+                    self.snowplow.draw_snowplow(x_coor, y_coor)
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
-                        y_coor += 10
+                        y_coor += HCV.move
                     if event.key == pygame.K_UP:
-                        y_coor -= 10
+                        y_coor -= HCV.move
                     if event.key == pygame.K_LEFT:
-                        x_coor -= 10
+                        x_coor -= HCV.move
                     if event.key == pygame.K_RIGHT:
-                        x_coor += 10
+                        x_coor += HCV.move
                     self.screen.blit(self.background_image, [0, 0])
-                    self.snowplow.place_snowplow(x_coor, y_coor)
+                    self.snowplow.draw_snowplow(x_coor, y_coor)
 
-                self.parkinglot_barriers(loop_counter)
+                self.get_barrier_coordinates(loop_counter)
                 self.draw_grid()
                 loop_counter += 1
             pygame.display.flip()
