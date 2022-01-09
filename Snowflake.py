@@ -13,7 +13,7 @@ class Snowflake:
     def draw_snowflake(self, grid_x, grid_y):
         # Convert grid coordinates to pixel coordinates
         self.pix_x = grid_x * HCV.BLOCK_WIDTH
-        self.pix_y = grid_y * HCV.BLOCK_HEIGHT
+        self.pix_y = grid_y * HCV.BLOCK_WIDTH
         self.parent_screen.blit(self.snowflake_character, [self.pix_x, self.pix_y])
         pygame.display.flip()
 
