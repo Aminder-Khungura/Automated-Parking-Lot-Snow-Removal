@@ -1,8 +1,3 @@
-# Use pygame for visualization, need to see:
-# 1) The movement of snow plow
-# 2) When plow is down and up
-# 3) Use color gradient show where snow is being pilled up
-
 import pygame
 import cv2 as cv
 import numpy as np
@@ -13,17 +8,27 @@ class Snowplow:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
         self.snowplow_character = pygame.image.load('snowplow_character.png')
+        self.snowplow_character = pygame.transform.scale(self.snowplow_character, (45, 45))
         self.x_start = 0
         self.y_start = 0
         self.x_coor = 0
         self.y_coor = 0
+        self.grid_x_start = 0
+        self.grid_y_start = 0
+        self.grid_x_coor = 0
+        self.grid_y_coor = 0
 
+    # Store the pixel and grid coordinates of the snowplow starting location
     def get_start_pos(self):
         self.x_coor, self.y_coor = pygame.mouse.get_pos()
         self.x_coor -= HCV.SNOWPLOW_IMG_OFFSET
         self.y_coor -= HCV.SNOWPLOW_IMG_OFFSET
         self.x_start = self.x_coor
         self.y_start = self.y_coor
+        self.grid_x_start = (self.x_start + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+        self.grid_y_start = (self.y_start + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+        self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+        self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
 
     def draw_snowplow(self, x, y):
         self.parent_screen.blit(self.snowplow_character, [x, y])
@@ -44,6 +49,7 @@ class Snowflake:
         self.pix_y = 0
 
     def draw_snowflake(self, grid_x, grid_y):
+        # Convert grid coordinates to pixel coordinates
         self.pix_x = grid_x * HCV.BLOCK_WIDTH
         self.pix_y = grid_y * HCV.BLOCK_HEIGHT
         self.parent_screen.blit(self.snowflake_character, [self.pix_x, self.pix_y])
@@ -60,9 +66,10 @@ class Display:
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
         self.screen.blit(self.background_image, [0, 0])
         self.snowplow = Snowplow(self.screen)
-        # self.rows = HCV.screen_width // HCV.pixels_per_block
-        # self.cols = HCV.screen_height // HCV.pixels_per_block
         self.snowflake = Snowflake(self.screen)
+
+    def draw_background(self):
+        self.screen.blit(self.background_image, [0, 0])
 
     def get_barrier_coordinates(self, loop_counter):
         # Convert windowSurface to cv2 Reference: https://stackoverflow.com/questions/19240422/display-cv2-videocapture-image-inside-pygame-surface
@@ -123,21 +130,24 @@ class Display:
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.snowplow.get_start_pos()
-                    self.screen.blit(self.background_image, [0, 0])
+                    self.draw_background()
                     self.snowplow.draw_snowplow(self.snowplow.x_start, self.snowplow.y_start)
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
-                        self.snowplow.y_coor += HCV.MOVE
+                        self.snowplow.y_coor += HCV.MOVE_Y
+                        self.snowplow.grid_y_coor = (self.snowplow.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
                     if event.key == pygame.K_UP:
-                        self.snowplow.y_coor -= HCV.MOVE
+                        self.snowplow.y_coor -= HCV.MOVE_Y
+                        self.snowplow.grid_y_coor = (self.snowplow.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
                     if event.key == pygame.K_LEFT:
-                        self.snowplow.x_coor -= HCV.MOVE
+                        self.snowplow.x_coor -= HCV.MOVE_X
+                        self.snowplow.grid_x_coor = (self.snowplow.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
                     if event.key == pygame.K_RIGHT:
-                        self.snowplow.x_coor += HCV.MOVE
-                    self.screen.blit(self.background_image, [0, 0])
+                        self.snowplow.x_coor += HCV.MOVE_X
+                        self.snowplow.grid_x_coor = (self.snowplow.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+                    self.draw_background()
                     self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
-
                 self.get_barrier_coordinates(loop_counter)
                 self.snowflake.draw_snowflake(5, 3)
                 self.draw_grid()
