@@ -1,18 +1,22 @@
 # Snowflake values
-x_transform = 30
-y_transform = 30
+X_TRANSFORM = 20
+Y_TRANSFORM = 20
+SNOWFLAKE_IMG_OFFSET = 32
 
 # Display values
-screen_width = 987
-screen_height = 964
+SCREEN_WIDTH = 987
+SCREEN_HEIGHT = 964
 
 # Grid values
-pixels_per_block = 30
+GRID_ROWS = 50
+GRID_COLS = 50
+BLOCK_WIDTH = SCREEN_WIDTH // GRID_COLS
+BLOCK_HEIGHT = SCREEN_HEIGHT // GRID_ROWS
 
 # Snowplow values
-snowplow_img_offset = 30
-move = 10
+SNOWPLOW_IMG_OFFSET = 30
+MOVE = 10
 
 # Colors
-black = [0, 0, 0]
-white = [255, 255, 255]
+BLACK = [0, 0, 0]
+WHITE = [255, 255, 255]
