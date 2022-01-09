@@ -2,58 +2,8 @@ import pygame
 import cv2 as cv
 import numpy as np
 import HARD_CODED_VALUES as HCV
-
-
-class Snowplow:
-    def __init__(self, parent_screen):
-        self.parent_screen = parent_screen
-        self.snowplow_character = pygame.image.load('snowplow_character.png')
-        self.snowplow_character = pygame.transform.scale(self.snowplow_character, (45, 45))
-        self.x_start = 0
-        self.y_start = 0
-        self.x_coor = 0
-        self.y_coor = 0
-        self.grid_x_start = 0
-        self.grid_y_start = 0
-        self.grid_x_coor = 0
-        self.grid_y_coor = 0
-
-    # Store the pixel and grid coordinates of the snowplow starting location
-    def get_start_pos(self):
-        self.x_coor, self.y_coor = pygame.mouse.get_pos()
-        self.x_coor -= HCV.SNOWPLOW_IMG_OFFSET
-        self.y_coor -= HCV.SNOWPLOW_IMG_OFFSET
-        self.x_start = self.x_coor
-        self.y_start = self.y_coor
-        self.grid_x_start = (self.x_start + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-        self.grid_y_start = (self.y_start + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-        self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-        self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-
-    def draw_snowplow(self, x, y):
-        self.parent_screen.blit(self.snowplow_character, [x, y])
-        pygame.display.flip()
-
-    def pacman_algorithm(self):
-        self.running = True
-        # create algorithm that controls snowplow's movement to maximize the amount of snow collected
-        # add small snowflake images to background that will be collected by snowplow when position overlaps pics
-
-
-class Snowflake:
-    def __init__(self, parent_screen):
-        self.parent_screen = parent_screen
-        self.snowflake_character = pygame.image.load('snowflake.png').convert()
-        self.snowflake_character = pygame.transform.scale(self.snowflake_character, (HCV.X_TRANSFORM, HCV.Y_TRANSFORM))
-        self.pix_x = 0
-        self.pix_y = 0
-
-    def draw_snowflake(self, grid_x, grid_y):
-        # Convert grid coordinates to pixel coordinates
-        self.pix_x = grid_x * HCV.BLOCK_WIDTH
-        self.pix_y = grid_y * HCV.BLOCK_HEIGHT
-        self.parent_screen.blit(self.snowflake_character, [self.pix_x, self.pix_y])
-        pygame.display.flip()
+import Snowplow
+import Snowflake
 
 
 class Display:
@@ -65,8 +15,8 @@ class Display:
         pygame.display.set_icon(self.icon)
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
         self.screen.blit(self.background_image, [0, 0])
-        self.snowplow = Snowplow(self.screen)
-        self.snowflake = Snowflake(self.screen)
+        self.snowplow = Snowplow.Snowplow(self.screen)
+        self.snowflake = Snowflake.Snowflake(self.screen)
 
     def draw_background(self):
         self.screen.blit(self.background_image, [0, 0])
@@ -149,12 +99,7 @@ class Display:
                     self.draw_background()
                     self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
                 self.get_barrier_coordinates(loop_counter)
-                self.snowflake.draw_snowflake(5, 3)
+                self.snowflake.draw_snowflake(9, 9)
                 self.draw_grid()
                 loop_counter += 1
             pygame.display.flip()
-
-
-if __name__ == '__main__':
-    display = Display()
-    display.run()
