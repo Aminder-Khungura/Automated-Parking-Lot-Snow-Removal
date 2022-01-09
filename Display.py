@@ -24,7 +24,6 @@ class Display:
     def draw_grid(self):
         for i in range(HCV.GRID_ROWS):
             pygame.draw.line(self.screen, HCV.WHITE, (i * HCV.BLOCK_WIDTH, 0), (i * HCV.BLOCK_WIDTH, HCV.SCREEN_WIDTH))
-
         for i in range(HCV.GRID_COLS):
             pygame.draw.line(self.screen, HCV.WHITE, (0, i * HCV.BLOCK_HEIGHT), (HCV.SCREEN_HEIGHT, i * HCV.BLOCK_HEIGHT))
 
