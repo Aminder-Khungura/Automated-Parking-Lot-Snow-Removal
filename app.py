@@ -6,22 +6,24 @@
 import pygame
 import cv2 as cv
 import numpy as np
-import hard_coded_values as HCV
+import HARD_CODED_VALUES as HCV
 
 
 class Snowplow:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
         self.snowplow_character = pygame.image.load('snowplow_character.png')
+        self.x_start = 0
+        self.y_start = 0
+        self.x_coor = 0
+        self.y_coor = 0
 
-    @staticmethod
-    def get_start_pos():
-        x, y = pygame.mouse.get_pos()
-        x -= HCV.SNOWPLOW_IMG_OFFSET
-        y -= HCV.SNOWPLOW_IMG_OFFSET
-        x_start = x
-        y_start = y
-        return x_start, y_start, x, y
+    def get_start_pos(self):
+        self.x_coor, self.y_coor = pygame.mouse.get_pos()
+        self.x_coor -= HCV.SNOWPLOW_IMG_OFFSET
+        self.y_coor -= HCV.SNOWPLOW_IMG_OFFSET
+        self.x_start = self.x_coor
+        self.y_start = self.y_coor
 
     def draw_snowplow(self, x, y):
         self.parent_screen.blit(self.snowplow_character, [x, y])
@@ -38,7 +40,8 @@ class Snowflake:
         self.parent_screen = parent_screen
         self.snowflake_character = pygame.image.load('snowflake.png').convert()
         self.snowflake_character = pygame.transform.scale(self.snowflake_character, (HCV.X_TRANSFORM, HCV.Y_TRANSFORM))
-        # self.parent_screen.blit(self.snowflake_character, [0, 0])
+        self.pix_x = 0
+        self.pix_y = 0
 
     def draw_snowflake(self, grid_x, grid_y):
         self.pix_x = grid_x * HCV.BLOCK_WIDTH
@@ -119,21 +122,21 @@ class Display:
                     running = False
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    x_start, y_start, x_coor, y_coor = self.snowplow.get_start_pos()
+                    self.snowplow.get_start_pos()
                     self.screen.blit(self.background_image, [0, 0])
-                    self.snowplow.draw_snowplow(x_start, y_start)
+                    self.snowplow.draw_snowplow(self.snowplow.x_start, self.snowplow.y_start)
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_DOWN:
-                        y_coor += HCV.MOVE
+                        self.snowplow.y_coor += HCV.MOVE
                     if event.key == pygame.K_UP:
-                        y_coor -= HCV.MOVE
+                        self.snowplow.y_coor -= HCV.MOVE
                     if event.key == pygame.K_LEFT:
-                        x_coor -= HCV.MOVE
+                        self.snowplow.x_coor -= HCV.MOVE
                     if event.key == pygame.K_RIGHT:
-                        x_coor += HCV.MOVE
+                        self.snowplow.x_coor += HCV.MOVE
                     self.screen.blit(self.background_image, [0, 0])
-                    self.snowplow.draw_snowplow(x_coor, y_coor)
+                    self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
 
                 self.get_barrier_coordinates(loop_counter)
                 self.snowflake.draw_snowflake(5, 3)
