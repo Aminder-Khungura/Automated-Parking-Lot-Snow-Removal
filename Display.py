@@ -17,6 +17,7 @@ class Display:
         self.snowplow = Snowplow.Snowplow(self.screen)
         self.snowflake = Snowflake.Snowflake(self.screen)
         self.barriers = Barriers.Barriers(self.screen)
+        self.collision = False
 
     def draw_background(self):
         self.screen.blit(self.background_image, [0, 0])
@@ -31,44 +32,45 @@ class Display:
         coor = str(x) + ' ' + str(y)
         if coor in self.barriers.grid_boundary_coors:
             print('On Boundary')
+            self.collision = True
+            print('Collision')
         elif coor in self.barriers.grid_parkingspot_coors:
             print('On Parkingspot')
         elif coor in self.barriers.grid_entry_coors:
             print('On Entry')
         else:
-            print('Black Space')
+            print('On Black')
+        return self.collision
 
     def run(self):
         running = True
         while running:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-
-                # Place snowplow at user's start location
+                # Place snowplow at start location
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     self.snowplow.get_start_pos()
                     self.draw_background()
                     self.snowplow.draw_snowplow(self.snowplow.x_start, self.snowplow.y_start)
 
-                # Move snowplow with arrow keys
+                # Move snowplow
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_DOWN:
-                        self.snowplow.y_coor += HCV.MOVE_Y
-                        self.snowplow.grid_y_coor = (self.snowplow.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-                    if event.key == pygame.K_UP:
-                        self.snowplow.y_coor -= HCV.MOVE_Y
-                        self.snowplow.grid_y_coor = (self.snowplow.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-                    if event.key == pygame.K_LEFT:
-                        self.snowplow.x_coor -= HCV.MOVE_X
-                        self.snowplow.grid_x_coor = (self.snowplow.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-                    if event.key == pygame.K_RIGHT:
-                        self.snowplow.x_coor += HCV.MOVE_X
-                        self.snowplow.grid_x_coor = (self.snowplow.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-                    self.draw_background()
-                    self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
+                    pix_x, pix_y, grid_x, grid_y, original_x_coor, original_y_coor = self.snowplow.move_snowplow(event)
+                    collision_detected = self.detect_collision(grid_x, grid_y)
+                    if not collision_detected:
+                        self.draw_background()
+                        self.snowplow.draw_snowplow(pix_x, pix_y)
+                    else:
+                        self.snowplow.x_coor = original_x_coor
+                        self.snowplow.y_coor = original_y_coor
+                        self.collision = False
+                        
 
                 self.snowflake.draw_snowflake(30, 0)
                 self.draw_grid()
                 self.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
-            pygame.display.flip()
+
+                # Quit
+                if event.type == pygame.QUIT:
+                    running = False
+
+            pygame.display.update()

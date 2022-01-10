@@ -30,5 +30,23 @@ class Snowplow:
 
     def draw_snowplow(self, x, y):
         self.parent_screen.blit(self.snowplow_character, [x, y])
-        pygame.display.flip()
+
+    def move_snowplow(self, event):
+        original_x_coor = self.x_coor
+        original_y_coor = self.y_coor
+        if event.key == pygame.K_DOWN:
+            self.y_coor += HCV.MOVE_Y
+            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+        if event.key == pygame.K_UP:
+            self.y_coor -= HCV.MOVE_Y
+            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+        if event.key == pygame.K_LEFT:
+            self.x_coor -= HCV.MOVE_X
+            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+        if event.key == pygame.K_RIGHT:
+            self.x_coor += HCV.MOVE_X
+            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+        return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor, original_x_coor, original_y_coor
+
+
 
