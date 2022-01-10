@@ -32,7 +32,3 @@ class Snowplow:
         self.parent_screen.blit(self.snowplow_character, [x, y])
         pygame.display.flip()
 
-    def pacman_algorithm(self):
-        self.running = True
-        # create algorithm that controls snowplow's movement to maximize the amount of snow collected
-        # add small snowflake images to background that will be collected by snowplow when position overlaps pics

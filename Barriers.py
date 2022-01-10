@@ -2,8 +2,6 @@ import pygame
 import cv2 as cv
 import numpy as np
 import HARD_CODED_VALUES as HCV
-import Snowplow
-import Snowflake
 
 
 class Barriers:
@@ -59,18 +57,27 @@ class Barriers:
         #     pygame.draw.circle(self.parent_screen, [255, 255, 255], (self.x_entry[i], self.y_entry[i]), 1)
 
         # Convert pixel coordinates to grid coordinates
-        self.grid_x_boundary = []
-        self.grid_y_boundary = []
-        self.grid_x_parkingspot = []
-        self.grid_y_parkingspot = []
-        self.grid_x_entry = []
-        self.grid_y_entry = []
+        self.grid_boundary_coors = []
+        self.grid_parkingspot_coors = []
+        self.grid_entry_coors = []
         for i in range(len(self.y_boundary)):
-            self.grid_x_boundary.extend([self.x_boundary[i] // HCV.BLOCK_WIDTH])
-            self.grid_y_boundary.extend([self.y_boundary[i] // HCV.BLOCK_WIDTH])
+            x = str(self.x_boundary[i] // HCV.BLOCK_WIDTH)
+            y = str(self.y_boundary[i] // HCV.BLOCK_WIDTH)
+            coor = x + ' ' + y
+            self.grid_boundary_coors.append(coor)
         for i in range(len(self.y_parkingspot)):
-            self.grid_x_parkingspot.extend([self.x_parkingspot[i] // HCV.BLOCK_WIDTH])
-            self.grid_y_parkingspot.extend([self.y_parkingspot[i] // HCV.BLOCK_WIDTH])
+            x = str(self.x_parkingspot[i] // HCV.BLOCK_WIDTH)
+            y = str(self.y_parkingspot[i] // HCV.BLOCK_WIDTH)
+            coor = x + ' ' + y
+            self.grid_parkingspot_coors.append(coor)
         for i in range(len(self.y_entry)):
-            self.grid_x_entry.extend([self.x_entry[i] // HCV.BLOCK_WIDTH])
-            self.grid_y_entry.extend([self.y_entry[i] // HCV.BLOCK_WIDTH])
+            x = str(self.x_entry[i] // HCV.BLOCK_WIDTH)
+            y = str(self.y_entry[i] // HCV.BLOCK_WIDTH)
+            coor = x + ' ' + y
+            self.grid_entry_coors.append(coor)
+
+        self.grid_boundary_coors = list(dict.fromkeys(self.grid_boundary_coors))
+        self.grid_parkingspot_coors = list(dict.fromkeys(self.grid_parkingspot_coors))
+        self.grid_entry_coors = list(dict.fromkeys(self.grid_entry_coors))
+
+

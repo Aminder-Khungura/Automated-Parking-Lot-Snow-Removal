@@ -27,6 +27,11 @@ class Display:
         for i in range(HCV.GRID_COLS):
             pygame.draw.line(self.screen, HCV.WHITE, (0, i * HCV.BLOCK_HEIGHT), (HCV.SCREEN_HEIGHT, i * HCV.BLOCK_HEIGHT))
 
+    def check_if_on_boundary(self, x, y):
+        coor = str(x) + ' ' + str(y)
+        if coor in self.barriers.grid_boundary_coors:
+            print('On Boundary: ', coor)
+
     def run(self):
         running = True
         while running:
@@ -59,4 +64,5 @@ class Display:
 
                 self.snowflake.draw_snowflake(30, 0)
                 self.draw_grid()
+                self.check_if_on_boundary(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
             pygame.display.flip()
