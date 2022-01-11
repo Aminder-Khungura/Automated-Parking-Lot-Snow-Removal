@@ -26,17 +26,8 @@ entry_result = cv.bitwise_and(parkingLot_hsv, parkingLot_hsv, mask=entry_mask)
 blend1 = cv.addWeighted(boundary_result, 1, parkingSpot_result, 1, 0)
 blend2 = cv.addWeighted(blend1, 1, entry_result, 1, 0)
 
-# Clean up final image before saving
-# kernel_erode = np.ones((2, 2), np.uint8)
-# kernel_close = np.ones((15, 15), np.uint8)
-# erode = cv.erode(blend2, kernel_erode)
-# closing = cv.morphologyEx(erode, cv.MORPH_CLOSE, kernel_close)
-
 # Save final edited image
 pic_RGB = cv.cvtColor(blend2, cv.COLOR_HSV2RGB)
-# image_center = tuple(np.array(pic_RGB.shape[1::-1]) / 2)
-# rot_mat = cv.getRotationMatrix2D(image_center, -35, 1.0)
-# result = cv.warpAffine(pic_RGB, rot_mat, pic_RGB.shape[1::-1], flags=cv.INTER_LINEAR)
 cv.imwrite('Edited Parking Lot.jpg', pic_RGB)
 
 # cv.imshow('Parking Lot', closing)

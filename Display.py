@@ -63,12 +63,10 @@ class Display:
                         self.snowplow.x_coor = original_x_coor
                         self.snowplow.y_coor = original_y_coor
                         self.collision = False
-                        
 
-                self.snowflake.draw_snowflake(30, 0)
-                self.draw_grid()
                 self.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
 
+                self.draw_grid()
                 # Quit
                 if event.type == pygame.QUIT:
                     running = False
