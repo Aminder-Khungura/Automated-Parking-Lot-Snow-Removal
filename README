@@ -1,4 +1,15 @@
-# Use pygame for visualization, need to see:
-# 1) The movement of snow plow
-# 2) When plow is down and up
-# 3) Use color gradient show where snow is being pilled up
+# Used OpenCV to map and identify:
+1) Parking lot outer boundary
+2) Parking spot lines
+3) Entry and exit to parking lot
+
+
+# Use Pygame for visualization, need to see:
+1) The movement of snowplough
+2) When snow plow collects and deposits snow
+
+
+# Added snowflakes onto to image processed by OpenCV, these snowflakes will incentive the snowplows movement
+
+
+# Optimization will be done through the use of a Greedy algorithm and reinforcement learning
