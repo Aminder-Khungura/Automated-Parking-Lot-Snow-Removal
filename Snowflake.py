@@ -12,7 +12,8 @@ class Snowflake:
         self.possible_coors = self.get_possible_coors(self.parent_screen)
         self.pix_x = 0
         self.pix_y = 0
-        # self.parkinglot_coors = [[]]
+        self.parkinglot_coors = [[]]
+        self.parkinglot_coors = self.get_parkinglot_coors(self.parent_screen)
         self.barriers = Barriers.Barriers(self.parent_screen)
 
     def get_possible_coors(self, parent_screen):
@@ -23,8 +24,9 @@ class Snowflake:
                 array_index += 1
         return self.possible_coors
 
-    # def get_parkinglot_coors(self):
-    #     self.parkinglot_coors = [[]]
+    def get_parkinglot_coors(self, parent_screen):
+        self.parkinglot_coors = [[8, 17], [9, 17], [10, 17], [11, 17], [12, 17], [13, 17], [14, 17], [15, 17], [16, 17], [17, 17], [18, 17], [19, 17], [20, 17], [21, 17], [22, 17], [23, 17], [24, 17]]
+        return self.parkinglot_coors
     #     on_boundary = False
     #     i = 0
     #     while i < len(self.possible_coors):

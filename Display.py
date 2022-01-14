@@ -65,7 +65,7 @@ class Display:
                         self.collision = False
 
                 self.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
-                # self.snowflake.draw_snowflakes(self.snowflake.possible_coors)
+                self.snowflake.draw_snowflakes(self.snowflake.parkinglot_coors)
                 self.draw_grid()
 
                 # Quit
