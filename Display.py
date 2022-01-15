@@ -56,7 +56,7 @@ class Display:
         while running:
             for event in pygame.event.get():
                 # Place snowplow at start location
-                if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.type == pygame.MOUSEBUTTONDOWN and not self.snowplow.start_pos_set:
                     self.snowplow.get_start_pos()
                     self.draw_background()
                     self.snowplow.draw_snowplow(self.snowplow.x_start, self.snowplow.y_start)
