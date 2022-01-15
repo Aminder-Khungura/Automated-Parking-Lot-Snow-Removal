@@ -9,14 +9,14 @@ class Snowflake:
         self.snowflake_character = pygame.image.load('snowflake.png').convert_alpha()
         self.snowflake_character = pygame.transform.scale(self.snowflake_character, (HCV.X_TRANSFORM, HCV.Y_TRANSFORM))
         self.possible_coors = [[0] * 2] * (HCV.GRID_ROWS * HCV.GRID_COLS)
-        self.possible_coors = self.get_possible_coors(self.parent_screen)
+        self.possible_coors = self.get_possible_coors()
         self.pix_x = 0
         self.pix_y = 0
         self.barriers = Barriers.Barriers(self.parent_screen)
-        self.parkinglot_coors = self.get_parkinglot_coors(self.parent_screen)
+        self.parkinglot_coors = self.get_parkinglot_coors()
         self.snowflake_coors = self.parkinglot_coors
 
-    def get_possible_coors(self, parent_screen):
+    def get_possible_coors(self):
         array_index = 0
         for i in range(HCV.GRID_COLS):
             for j in range(HCV.GRID_ROWS):
@@ -24,7 +24,7 @@ class Snowflake:
                 array_index += 1
         return self.possible_coors
 
-    def get_parkinglot_coors(self, parent_screen):
+    def get_parkinglot_coors(self):
         self.parkinglot_coors = [[29, 1], [30, 1], [31, 1],
                             [27, 2], [28, 2], [29, 2], [30, 2], [31, 2], [32, 2],
                             [26, 3], [27, 3], [28, 3], [29, 3], [30, 3], [31, 3], [32, 3], [33, 3],
@@ -78,4 +78,3 @@ class Snowflake:
             self.pix_x = coor[0] * HCV.BLOCK_WIDTH
             self.pix_y = coor[1] * HCV.BLOCK_WIDTH
             self.parent_screen.blit(self.snowflake_character, [self.pix_x, self.pix_y])
-

@@ -51,6 +51,3 @@ class Snowplow:
             self.x_coor += HCV.MOVE_X
             self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
         return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor, original_x_coor, original_y_coor
-
-
-

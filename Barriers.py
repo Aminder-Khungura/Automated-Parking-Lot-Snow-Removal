@@ -106,4 +106,3 @@ class Barriers:
         self.grid_boundary_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
         self.grid_parkingspot_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
         self.grid_entry_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
-
