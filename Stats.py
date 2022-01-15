@@ -6,9 +6,12 @@ class Stats:
         self.parent_screen = parent_screen
         self.points = 0
         self.distance_travelled = 0
+        self.collisions = 0
 
     def display_info(self, font):
         score = font.render("Score: " + str(self.points), True, HCV.WHITE)
         distance = font.render("Distance Travelled : " + str(self.distance_travelled), True, HCV.WHITE)
+        collision = font.render("Collisions : " + str(self.collisions), True, HCV.WHITE)
         self.parent_screen.blit(score, (HCV.SCORE_X, HCV.SCORE_Y))
         self.parent_screen.blit(distance, (HCV.DISTANCE_X, HCV.DISTANCE_Y))
+        self.parent_screen.blit(collision, (HCV.COLLISION_X, HCV.COLLISION_Y))

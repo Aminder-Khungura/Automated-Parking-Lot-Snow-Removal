@@ -20,7 +20,7 @@ class Display:
         self.barriers = Barriers.Barriers(self.screen)
         self.collision = False
         self.stats = Stats.Stats(self.screen)
-        self.font = pygame.font.SysFont('arial', 32)
+        self.font = pygame.font.SysFont('Corbel', 32)
 
     def draw_background(self):
         self.screen.blit(self.background_image, [0, 0])
@@ -34,16 +34,8 @@ class Display:
     def detect_collision(self, x, y):
         coor = str(x) + ' ' + str(y)
         if coor in self.barriers.grid_boundary_coors:
-            # print('Collision on Boundary')
             self.collision = True
-        elif coor in self.barriers.grid_parkingspot_coors:
-            # print('On Parkingspot')
-            self.collision = False
-        elif coor in self.barriers.grid_entry_coors:
-            # print('On Entry')
-            self.collision = False
         else:
-            # print('On Black')
             self.collision = False
         return self.collision
 
@@ -75,7 +67,9 @@ class Display:
                     else:
                         self.snowplow.x_coor = original_x_coor
                         self.snowplow.y_coor = original_y_coor
-                        self.collision = False
+                        self.draw_background()
+                        self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
+                        self.stats.collisions += 1
 
                 self.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
