@@ -6,15 +6,15 @@ import Barriers
 class Snowflake:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
-        self.snowflake_character = pygame.image.load('snowflake.png').convert()
+        self.snowflake_character = pygame.image.load('snowflake.png').convert_alpha()
         self.snowflake_character = pygame.transform.scale(self.snowflake_character, (HCV.X_TRANSFORM, HCV.Y_TRANSFORM))
         self.possible_coors = [[0] * 2] * (HCV.GRID_ROWS * HCV.GRID_COLS)
         self.possible_coors = self.get_possible_coors(self.parent_screen)
         self.pix_x = 0
         self.pix_y = 0
-        self.parkinglot_coors = [[]]
-        self.parkinglot_coors = self.get_parkinglot_coors(self.parent_screen)
         self.barriers = Barriers.Barriers(self.parent_screen)
+        self.parkinglot_coors = self.get_parkinglot_coors(self.parent_screen)
+        self.snowflake_coors = self.parkinglot_coors
 
     def get_possible_coors(self, parent_screen):
         array_index = 0
@@ -62,22 +62,14 @@ class Snowflake:
                             [27, 45], [28, 45], [29, 45], [30, 45], [31, 45],
                             [27, 46], [28, 46], [29, 46],
                             [28, 47]]
+
+        # Remove coordinates from self.parkinglot_coors that are on boundary coordinates
+        for i in self.barriers.grid_boundary_coors_INT:
+            coor = list(i)
+            if coor in self.parkinglot_coors:
+                self.parkinglot_coors.remove(coor)
+
         return self.parkinglot_coors
-    #     on_boundary = False
-    #     i = 0
-    #     while i < len(self.possible_coors):
-    #         coor = self.possible_coors[i]
-    #         if coor in self.barriers.grid_boundary_coors:
-    #             on_boundary = True
-    #             parkinglot_coors.append(coor)
-    #         while on_boundary:
-    #             i += 1
-    #             coor = self.possible_coors[i]
-    #             if coor not in self.barriers.grid_boundary_coors:
-    #                 on_boundary = False
-    #                 parkinglot_coors.append(coor)
-    #
-    #         i += 1
 
     def draw_snowflakes(self, arr):
         for i in arr:

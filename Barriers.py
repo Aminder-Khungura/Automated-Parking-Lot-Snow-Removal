@@ -60,24 +60,50 @@ class Barriers:
         self.grid_boundary_coors = []
         self.grid_parkingspot_coors = []
         self.grid_entry_coors = []
+        grid_boundary_coors_int_x = []
+        grid_parkingspot_coors_int_x = []
+        grid_entry_coors_int_x = []
+        grid_boundary_coors_int_y = []
+        grid_parkingspot_coors_int_y = []
+        grid_entry_coors_int_y = []
         for i in range(len(self.y_boundary)):
             x = str(self.x_boundary[i] // HCV.BLOCK_WIDTH)
             y = str(self.y_boundary[i] // HCV.BLOCK_WIDTH)
             coor = x + ' ' + y
             self.grid_boundary_coors.append(coor)
+            x_int = self.x_boundary[i] // HCV.BLOCK_WIDTH
+            y_int = self.y_boundary[i] // HCV.BLOCK_WIDTH
+            grid_boundary_coors_int_x.append(x_int)
+            grid_boundary_coors_int_y.append(y_int)
         for i in range(len(self.y_parkingspot)):
             x = str(self.x_parkingspot[i] // HCV.BLOCK_WIDTH)
             y = str(self.y_parkingspot[i] // HCV.BLOCK_WIDTH)
             coor = x + ' ' + y
             self.grid_parkingspot_coors.append(coor)
+            x_int = self.x_parkingspot[i] // HCV.BLOCK_WIDTH
+            y_int = self.y_parkingspot[i] // HCV.BLOCK_WIDTH
+            grid_parkingspot_coors_int_x.append(x_int)
+            grid_parkingspot_coors_int_y.append(y_int)
         for i in range(len(self.y_entry)):
             x = str(self.x_entry[i] // HCV.BLOCK_WIDTH)
             y = str(self.y_entry[i] // HCV.BLOCK_WIDTH)
             coor = x + ' ' + y
             self.grid_entry_coors.append(coor)
+            x_int = self.x_entry[i] // HCV.BLOCK_WIDTH
+            y_int = self.y_entry[i] // HCV.BLOCK_WIDTH
+            grid_entry_coors_int_x.append(x_int)
+            grid_entry_coors_int_y.append(y_int)
 
+        # Combine x and y arrays into one 2D array
+        self.grid_boundary_coors_INT = np.stack((grid_boundary_coors_int_x, grid_boundary_coors_int_y), axis=-1)
+        self.grid_parkingspot_coors_INT = np.stack((grid_parkingspot_coors_int_x, grid_parkingspot_coors_int_y), axis=-1)
+        self.grid_entry_coors_INT = np.stack((grid_entry_coors_int_x, grid_entry_coors_int_y), axis=-1)
+
+        # Delete duplicates values in list/arrays
         self.grid_boundary_coors = list(dict.fromkeys(self.grid_boundary_coors))
         self.grid_parkingspot_coors = list(dict.fromkeys(self.grid_parkingspot_coors))
         self.grid_entry_coors = list(dict.fromkeys(self.grid_entry_coors))
-
+        self.grid_boundary_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
+        self.grid_parkingspot_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
+        self.grid_entry_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
 

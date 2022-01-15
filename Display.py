@@ -42,6 +42,14 @@ class Display:
             print('On Black')
         return self.collision
 
+    def remove_snow(self, x, y):
+        coor = [x, y]
+        if coor in self.snowflake.snowflake_coors:
+            print("SNOWFLAKE")
+            self.snowflake.snowflake_coors.remove(coor)
+        return self.snowflake.snowflake_coors
+
+
     def run(self):
         running = True
         while running:
@@ -65,7 +73,8 @@ class Display:
                         self.collision = False
 
                 self.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
-                self.snowflake.draw_snowflakes(self.snowflake.parkinglot_coors)
+                self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
+                self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
                 self.draw_grid()
 
                 # Quit
