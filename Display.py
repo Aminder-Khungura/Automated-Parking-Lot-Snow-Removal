@@ -47,8 +47,9 @@ class Display:
         if coor in self.snowflake.snowflake_coors:
             print("SNOWFLAKE")
             self.snowflake.snowflake_coors.remove(coor)
+            self.snowplow.points += 1
+            print("Score: ", self.snowplow.points)
         return self.snowflake.snowflake_coors
-
 
     def run(self):
         running = True

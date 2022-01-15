@@ -15,6 +15,7 @@ class Snowplow:
         self.grid_y_start = 0
         self.grid_x_coor = 0
         self.grid_y_coor = 0
+        self.points = 0
 
     # Store the pixel and grid coordinates of the snowplow starting location
     def get_start_pos(self):
