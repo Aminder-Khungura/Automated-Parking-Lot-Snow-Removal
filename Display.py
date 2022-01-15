@@ -3,13 +3,14 @@ import HARD_CODED_VALUES as HCV
 import Snowplow
 import Snowflake
 import Barriers
+import Stats
 
 
 class Display:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((HCV.SCREEN_WIDTH, HCV.SCREEN_HEIGHT))
-        pygame.display.set_caption("Snowplow Visualization")
+        pygame.display.set_caption("Parking Lot Snow Removal Visualization")
         self.icon = pygame.image.load('snowplow.png')
         pygame.display.set_icon(self.icon)
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
@@ -18,6 +19,8 @@ class Display:
         self.snowflake = Snowflake.Snowflake(self.screen)
         self.barriers = Barriers.Barriers(self.screen)
         self.collision = False
+        self.stats = Stats.Stats(self.screen)
+        self.font = pygame.font.SysFont('arial', 32)
 
     def draw_background(self):
         self.screen.blit(self.background_image, [0, 0])
@@ -31,24 +34,24 @@ class Display:
     def detect_collision(self, x, y):
         coor = str(x) + ' ' + str(y)
         if coor in self.barriers.grid_boundary_coors:
-            print('On Boundary')
+            # print('Collision on Boundary')
             self.collision = True
-            print('Collision')
         elif coor in self.barriers.grid_parkingspot_coors:
-            print('On Parkingspot')
+            # print('On Parkingspot')
+            self.collision = False
         elif coor in self.barriers.grid_entry_coors:
-            print('On Entry')
+            # print('On Entry')
+            self.collision = False
         else:
-            print('On Black')
+            # print('On Black')
+            self.collision = False
         return self.collision
 
     def remove_snow(self, x, y):
         coor = [x, y]
         if coor in self.snowflake.snowflake_coors:
-            print("SNOWFLAKE")
             self.snowflake.snowflake_coors.remove(coor)
-            self.snowplow.points += 1
-            print("Score: ", self.snowplow.points)
+            self.stats.points += 1
         return self.snowflake.snowflake_coors
 
     def run(self):
@@ -68,6 +71,7 @@ class Display:
                     if not collision_detected:
                         self.draw_background()
                         self.snowplow.draw_snowplow(pix_x, pix_y)
+                        self.stats.distance_travelled += 1
                     else:
                         self.snowplow.x_coor = original_x_coor
                         self.snowplow.y_coor = original_y_coor
@@ -76,7 +80,8 @@ class Display:
                 self.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
-                self.draw_grid()
+                self.stats.display_info(self.font)
+                # self.draw_grid()
 
                 # Quit
                 if event.type == pygame.QUIT:

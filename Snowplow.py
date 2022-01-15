@@ -1,5 +1,6 @@
 import pygame
 import HARD_CODED_VALUES as HCV
+import Stats
 
 
 class Snowplow:
@@ -15,9 +16,8 @@ class Snowplow:
         self.grid_y_start = 0
         self.grid_x_coor = 0
         self.grid_y_coor = 0
-        self.points = 0
+        self.stats = Stats.Stats(self.parent_screen)
         self.start_pos_set = False
-        self.distance_travelled = 0
 
     # Store the pixel and grid coordinates of the snowplow starting location
     def get_start_pos(self):
@@ -41,19 +41,15 @@ class Snowplow:
         if event.key == pygame.K_DOWN:
             self.y_coor += HCV.MOVE_Y
             self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-            self.distance_travelled += 1
         if event.key == pygame.K_UP:
             self.y_coor -= HCV.MOVE_Y
             self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-            self.distance_travelled += 1
         if event.key == pygame.K_LEFT:
             self.x_coor -= HCV.MOVE_X
             self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-            self.distance_travelled += 1
         if event.key == pygame.K_RIGHT:
             self.x_coor += HCV.MOVE_X
             self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-            self.distance_travelled += 1
         return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor, original_x_coor, original_y_coor
 
 
