@@ -50,6 +50,10 @@ class Display:
         running = True
         while running:
             for event in pygame.event.get():
+                # Quit
+                if event.type == pygame.QUIT:
+                    running = False
+
                 # Place snowplow at start location
                 if event.type == pygame.MOUSEBUTTONDOWN and not self.snowplow.start_pos_set:
                     self.snowplow.get_start_pos()
@@ -71,14 +75,9 @@ class Display:
                         self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
                         self.stats.collisions += 1
 
-                self.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
                 self.stats.display_info(self.font)
-                # self.draw_grid()
-
-                # Quit
-                if event.type == pygame.QUIT:
-                    running = False
+                self.draw_grid()
 
             pygame.display.update()
