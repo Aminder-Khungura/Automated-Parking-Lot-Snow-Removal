@@ -79,6 +79,7 @@ class Display:
 
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
+                self.stats.snowpiles = len(self.snowpile.snowpile_coors)
                 self.snowpile.draw_snowpiles(self.snowpile.snowpile_coors)
                 self.stats.display_info(self.font)
                 # self.draw_grid()

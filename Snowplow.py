@@ -6,7 +6,7 @@ import Stats
 class Snowplow:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
-        self.snowplow_character = pygame.image.load('snowplow_character.png')
+        self.snowplow_character = pygame.image.load('snowplow (1).png')
         self.snowplow_character = pygame.transform.scale(self.snowplow_character, (HCV.SP_X_TRANSFORM, HCV.SP_Y_TRANSFORM))
         self.x_start = 0
         self.y_start = 0
