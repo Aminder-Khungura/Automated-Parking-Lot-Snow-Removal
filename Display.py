@@ -22,7 +22,7 @@ class Display:
         self.barriers = Barriers.Barriers(self.screen)
         self.collision = False
         self.stats = Stats.Stats(self.screen)
-        self.font = pygame.font.SysFont('Corbel', 32)
+        self.font = pygame.font.SysFont('Corbel', 28)
 
     def draw_background(self):
         self.screen.blit(self.background_image, [0, 0])
@@ -45,7 +45,7 @@ class Display:
         coor = [x, y]
         if coor in self.snowflake.snowflake_coors:
             self.snowflake.snowflake_coors.remove(coor)
-            self.stats.amount_of_snow_held += 1
+            self.stats.amount_of_snow_moved += 1
         return self.snowflake.snowflake_coors
 
     def run(self):
@@ -75,7 +75,7 @@ class Display:
                         self.snowplow.draw_snowplow(pix_x, pix_y)
                         self.snowpile.update_snowpile_coors(grid_x, grid_y)
                         self.stats.collisions += 1
-                        self.stats.points += self.stats.amount_of_snow_held
+                        self.stats.points += self.stats.amount_of_snow_moved
 
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
