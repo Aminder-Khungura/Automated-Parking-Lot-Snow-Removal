@@ -2,6 +2,7 @@ import pygame
 import HARD_CODED_VALUES as HCV
 import Snowplow
 import Snowflake
+import Snowpile
 import Barriers
 import Stats
 
@@ -17,6 +18,7 @@ class Display:
         self.screen.blit(self.background_image, [0, 0])
         self.snowplow = Snowplow.Snowplow(self.screen)
         self.snowflake = Snowflake.Snowflake(self.screen)
+        self.snowpile = Snowpile.Snowpile(self.screen)
         self.barriers = Barriers.Barriers(self.screen)
         self.collision = False
         self.stats = Stats.Stats(self.screen)
@@ -43,7 +45,7 @@ class Display:
         coor = [x, y]
         if coor in self.snowflake.snowflake_coors:
             self.snowflake.snowflake_coors.remove(coor)
-            self.stats.points += 1
+            self.stats.amount_of_snow_held += 1
         return self.snowflake.snowflake_coors
 
     def run(self):
@@ -69,15 +71,16 @@ class Display:
                         self.snowplow.draw_snowplow(pix_x, pix_y)
                         self.stats.distance_travelled += 1
                     else:
-                        self.snowplow.x_coor = original_x_coor
-                        self.snowplow.y_coor = original_y_coor
                         self.draw_background()
-                        self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
+                        self.snowplow.draw_snowplow(pix_x, pix_y)
+                        self.snowpile.update_snowpile_coors(grid_x, grid_y)
                         self.stats.collisions += 1
+                        self.stats.points += self.stats.amount_of_snow_held
 
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
+                self.snowpile.draw_snowpiles(self.snowpile.snowpile_coors)
                 self.stats.display_info(self.font)
-                self.draw_grid()
+                # self.draw_grid()
 
             pygame.display.update()
