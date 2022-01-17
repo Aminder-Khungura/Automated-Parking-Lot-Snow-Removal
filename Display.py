@@ -70,7 +70,7 @@ class Display:
                         self.draw_background()
                         self.snowplow.draw_snowplow(pix_x, pix_y)
                         self.stats.distance_travelled += 1
-                        self.snowplow.available_moves = ["DOWN", "UP", "LEFT", "RIGHT"]
+                        self.snowplow.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
                     else:
                         self.draw_background()
                         self.snowplow.draw_snowplow(pix_x, pix_y)
@@ -78,7 +78,7 @@ class Display:
                         self.stats.collisions += 1
                         self.stats.points += self.stats.amount_of_snow_moved
                         self.stats.amount_of_snow_moved = 0
-                        self.snowplow.change_direction(grid_x, grid_y)
+                        self.snowplow.available_directions_for_next_move(grid_x, grid_y)
                         # # Remove the last movement direction from list of available moves so snowplow doesnt continue into barrier
                         # if self.snowplow.last_move in self.snowplow.available_moves:
                         #     self.snowplow.available_moves.remove(self.snowplow.last_move)
