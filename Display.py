@@ -1,9 +1,9 @@
 import pygame
+
 import HARD_CODED_VALUES as HCV
 import Snowplow
 import Snowflake
 import Snowpile
-import Barriers
 import Stats
 
 
@@ -19,8 +19,6 @@ class Display:
         self.snowplow = Snowplow.Snowplow(self.screen)
         self.snowflake = Snowflake.Snowflake(self.screen)
         self.snowpile = Snowpile.Snowpile(self.screen)
-        # self.barriers = Barriers.Barriers(self.screen)
-        # self.collision = False
         self.stats = Stats.Stats(self.screen)
         self.font = pygame.font.SysFont('Corbel', 28)
 
@@ -32,14 +30,6 @@ class Display:
             pygame.draw.line(self.screen, HCV.WHITE, (i * HCV.BLOCK_WIDTH, 0), (i * HCV.BLOCK_WIDTH, HCV.SCREEN_WIDTH))
         for i in range(HCV.GRID_COLS):
             pygame.draw.line(self.screen, HCV.WHITE, (0, i * HCV.BLOCK_HEIGHT), (HCV.SCREEN_HEIGHT, i * HCV.BLOCK_HEIGHT))
-
-    # def detect_collision(self, x, y):
-    #     coor = str(x) + ' ' + str(y)
-    #     if coor in self.barriers.grid_boundary_coors:
-    #         self.collision = True
-    #     else:
-    #         self.collision = False
-    #     return self.collision
 
     def remove_snow(self, x, y):
         coor = [x, y]
@@ -61,6 +51,7 @@ class Display:
                     self.snowplow.get_start_pos()
                     self.draw_background()
                     self.snowplow.draw_snowplow(self.snowplow.x_start, self.snowplow.y_start)
+                    self.snowplow.path_finding(self.snowflake.snowflake_coors)
 
                 # Move snowplow
                 if event.type == pygame.KEYDOWN:
@@ -79,11 +70,6 @@ class Display:
                         self.stats.points += self.stats.amount_of_snow_moved
                         self.stats.amount_of_snow_moved = 0
                         self.snowplow.available_directions_for_next_move(grid_x, grid_y)
-                        # # Remove the last movement direction from list of available moves so snowplow doesnt continue into barrier
-                        # if self.snowplow.last_move in self.snowplow.available_moves:
-                        #     self.snowplow.available_moves.remove(self.snowplow.last_move)
-
-
 
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)

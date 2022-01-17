@@ -37,13 +37,12 @@ class Snowplow:
         self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
         self.start_pos_set = True
         self.available_directions_for_next_move(self.grid_x_start, self.grid_y_start)
-        print(self.available_directions)
 
     def draw_snowplow(self, x, y):
         self.parent_screen.blit(self.snowplow_character, [x, y])
 
-    def detect_collision(self, x, y):
-        coor = str(x) + ' ' + str(y)
+    def detect_collision(self, grid_x, grid_y):
+        coor = str(grid_x) + ' ' + str(grid_y)
         if coor in self.barriers.grid_boundary_coors or coor in self.barriers.grid_entry_coors:
             self.collision = True
         else:
@@ -102,4 +101,86 @@ class Snowplow:
                 collision_detected = self.detect_collision(x, y)
                 if collision_detected:
                     self.available_directions.remove("Right")
+
+    def path_finding(self, snowflake_coors):
+        print("Available Directions: ", self.available_directions)
+        for i in self.available_directions:
+            if i == "DOWN":
+                x = self.grid_x_coor
+                y = self.grid_y_coor
+                coor = [x, y]
+                snow_removed = 0
+                distance_travelled = 0
+                score_down = 9999
+                while not self.detect_collision(x, y):
+                    if coor in snowflake_coors:
+                        snow_removed += 1
+                    distance_travelled += 1
+                    score_down = snow_removed - distance_travelled
+                    print("DOWN----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                    y += 1
+                print("DOWN: ", score_down)
+
+            elif i == "UP":
+                x = self.grid_x_coor
+                y = self.grid_y_coor
+                coor = [x, y]
+                snow_removed = 0
+                distance_travelled = 0
+                score_up = 9999
+                while not self.detect_collision(x, y):
+                    if coor in snowflake_coors:
+                        snow_removed += 1
+                    distance_travelled += 1
+                    score_up = snow_removed - distance_travelled
+                    print("UP----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                    y -= 1
+                print("UP: ", score_up)
+
+            elif i == "LEFT":
+                x = self.grid_x_coor
+                y = self.grid_y_coor
+                coor = [x, y]
+                snow_removed = 0
+                distance_travelled = 0
+                score_left = 9999
+                while not self.detect_collision(x, y):
+                    if coor in snowflake_coors:
+                        snow_removed += 1
+                    distance_travelled += 1
+                    score_left = snow_removed - distance_travelled
+                    print("LEFT----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                    x -= 1
+                print("LEFT: ", score_left)
+
+            else:
+                x = self.grid_x_coor
+                y = self.grid_y_coor
+                coor = [x, y]
+                snow_removed = 0
+                distance_travelled = 0
+                score_right = 9999
+                while not self.detect_collision(x, y):
+                    if coor in snowflake_coors:
+                        snow_removed += 1
+                    distance_travelled += 1
+                    score_right = snow_removed - distance_travelled
+                    print("RIGHT----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                    x += 1
+                print("RIGHT: ", score_right)
+
+# Ideally every move should remove a snowflake
+# Remove all snowflakes
+# End with snowplow at entry
+# Snowplow can not turn until it deposits the snow it is currently holding, deposits must be at cell adjacent to boundary
+
+# 1) Check paths available from current position (up, down, left, right):
+#       a) count collectable snowflakes on that path until collision with boundary/entry
+#       b) count cells travelled on that path until collision with boundary/entry
+# 2) At boundary/entry location check paths available
+#       a) Ensure that snowflakes removed from previous move are not recounted
+#       b)
+
+# Calculate GRADE for paths (i.e. from boundary cell to perpendicular boundary cell), these two cells will have the same score therefore can save scores to speed up process
+# GRADE = Score - Distance Travelled
 
