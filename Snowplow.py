@@ -103,6 +103,7 @@ class Snowplow:
                     self.available_directions.remove("Right")
 
     def path_finding(self, snowflake_coors):
+        snow_coors = snowflake_coors
         print("Available Directions: ", self.available_directions)
         for i in self.available_directions:
             if i == "DOWN":
@@ -111,15 +112,23 @@ class Snowplow:
                 coor = [x, y]
                 snow_removed = 0
                 distance_travelled = 0
-                score_down = 9999
-                while not self.detect_collision(x, y):
-                    if coor in snowflake_coors:
+                collision = False
+                while not collision:
+                    if coor in snow_coors:
                         snow_removed += 1
-                    distance_travelled += 1
-                    score_down = snow_removed - distance_travelled
-                    print("DOWN----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                        snow_coors.remove(coor)
+
                     y += 1
-                print("DOWN: ", score_down)
+                    distance_travelled += 1
+                    coor = [x, y]
+                    collision = self.detect_collision(x, y)
+
+                if coor in snow_coors:
+                    snow_removed += 1
+                    snow_coors.remove(coor)
+
+                score_down = snow_removed - distance_travelled
+                print("DOWN:", score_down, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
 
             elif i == "UP":
                 x = self.grid_x_coor
@@ -127,15 +136,23 @@ class Snowplow:
                 coor = [x, y]
                 snow_removed = 0
                 distance_travelled = 0
-                score_up = 9999
-                while not self.detect_collision(x, y):
-                    if coor in snowflake_coors:
+                collision = False
+                while not collision:
+                    if coor in snow_coors:
                         snow_removed += 1
-                    distance_travelled += 1
-                    score_up = snow_removed - distance_travelled
-                    print("UP----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                        snow_coors.remove(coor)
+
                     y -= 1
-                print("UP: ", score_up)
+                    distance_travelled += 1
+                    coor = [x, y]
+                    collision = self.detect_collision(x, y)
+
+                if coor in snow_coors:
+                    snow_removed += 1
+                    snow_coors.remove(coor)
+
+                score_up = snow_removed - distance_travelled
+                print("UP:", score_up, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
 
             elif i == "LEFT":
                 x = self.grid_x_coor
@@ -143,15 +160,23 @@ class Snowplow:
                 coor = [x, y]
                 snow_removed = 0
                 distance_travelled = 0
-                score_left = 9999
-                while not self.detect_collision(x, y):
-                    if coor in snowflake_coors:
+                collision = False
+                while not collision:
+                    if coor in snow_coors:
                         snow_removed += 1
-                    distance_travelled += 1
-                    score_left = snow_removed - distance_travelled
-                    print("LEFT----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                        snow_coors.remove(coor)
+
                     x -= 1
-                print("LEFT: ", score_left)
+                    distance_travelled += 1
+                    coor = [x, y]
+                    collision = self.detect_collision(x, y)
+
+                if coor in snow_coors:
+                    snow_removed += 1
+                    snow_coors.remove(coor)
+
+                score_left = snow_removed - distance_travelled
+                print("LEFT:", score_left, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
 
             else:
                 x = self.grid_x_coor
@@ -159,15 +184,23 @@ class Snowplow:
                 coor = [x, y]
                 snow_removed = 0
                 distance_travelled = 0
-                score_right = 9999
-                while not self.detect_collision(x, y):
-                    if coor in snowflake_coors:
+                collision = False
+                while not collision:
+                    if coor in snow_coors:
                         snow_removed += 1
-                    distance_travelled += 1
-                    score_right = snow_removed - distance_travelled
-                    print("RIGHT----Snow: ", snow_removed, "Distance: ", distance_travelled)
+                        snow_coors.remove(coor)
+
                     x += 1
-                print("RIGHT: ", score_right)
+                    distance_travelled += 1
+                    coor = [x, y]
+                    collision = self.detect_collision(x, y)
+
+                if coor in snow_coors:
+                    snow_removed += 1
+                    snow_coors.remove(coor)
+
+                score_right = snow_removed - distance_travelled
+                print("RIGHT:", score_right, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
 
 # Ideally every move should remove a snowflake
 # Remove all snowflakes

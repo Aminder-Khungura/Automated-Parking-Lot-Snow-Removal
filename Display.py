@@ -76,6 +76,6 @@ class Display:
                 self.stats.snowpiles = len(self.snowpile.snowpile_coors)
                 self.snowpile.draw_snowpiles(self.snowpile.snowpile_coors)
                 self.stats.display_info(self.font)
-                # self.draw_grid()
+                self.draw_grid()
 
             pygame.display.update()
