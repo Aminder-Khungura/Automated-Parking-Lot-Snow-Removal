@@ -24,7 +24,6 @@ MOVE_Y = BLOCK_HEIGHT
 Snowpile_X_TRANSFORM = 20
 Snowpile_Y_TRANSFORM = 20
 
-
 # Colors
 BLACK = [0, 0, 0]
 WHITE = [255, 255, 255]

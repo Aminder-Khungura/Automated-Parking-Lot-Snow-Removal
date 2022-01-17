@@ -19,8 +19,8 @@ class Display:
         self.snowplow = Snowplow.Snowplow(self.screen)
         self.snowflake = Snowflake.Snowflake(self.screen)
         self.snowpile = Snowpile.Snowpile(self.screen)
-        self.barriers = Barriers.Barriers(self.screen)
-        self.collision = False
+        # self.barriers = Barriers.Barriers(self.screen)
+        # self.collision = False
         self.stats = Stats.Stats(self.screen)
         self.font = pygame.font.SysFont('Corbel', 28)
 
@@ -33,13 +33,13 @@ class Display:
         for i in range(HCV.GRID_COLS):
             pygame.draw.line(self.screen, HCV.WHITE, (0, i * HCV.BLOCK_HEIGHT), (HCV.SCREEN_HEIGHT, i * HCV.BLOCK_HEIGHT))
 
-    def detect_collision(self, x, y):
-        coor = str(x) + ' ' + str(y)
-        if coor in self.barriers.grid_boundary_coors:
-            self.collision = True
-        else:
-            self.collision = False
-        return self.collision
+    # def detect_collision(self, x, y):
+    #     coor = str(x) + ' ' + str(y)
+    #     if coor in self.barriers.grid_boundary_coors:
+    #         self.collision = True
+    #     else:
+    #         self.collision = False
+    #     return self.collision
 
     def remove_snow(self, x, y):
         coor = [x, y]
@@ -65,17 +65,25 @@ class Display:
                 # Move snowplow
                 if event.type == pygame.KEYDOWN:
                     pix_x, pix_y, grid_x, grid_y, original_x_coor, original_y_coor = self.snowplow.move_snowplow(event)
-                    collision_detected = self.detect_collision(grid_x, grid_y)
+                    collision_detected = self.snowplow.detect_collision(grid_x, grid_y)
                     if not collision_detected:
                         self.draw_background()
                         self.snowplow.draw_snowplow(pix_x, pix_y)
                         self.stats.distance_travelled += 1
+                        self.snowplow.available_moves = ["DOWN", "UP", "LEFT", "RIGHT"]
                     else:
                         self.draw_background()
                         self.snowplow.draw_snowplow(pix_x, pix_y)
                         self.snowpile.update_snowpile_coors(grid_x, grid_y)
                         self.stats.collisions += 1
                         self.stats.points += self.stats.amount_of_snow_moved
+                        self.stats.amount_of_snow_moved = 0
+                        self.snowplow.change_direction(grid_x, grid_y)
+                        # # Remove the last movement direction from list of available moves so snowplow doesnt continue into barrier
+                        # if self.snowplow.last_move in self.snowplow.available_moves:
+                        #     self.snowplow.available_moves.remove(self.snowplow.last_move)
+
+
 
                 self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
                 self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
