@@ -49,26 +49,26 @@ class Snowplow:
             self.collision = False
         return self.collision
 
-    def move_snowplow(self, event):
-        original_x_coor = self.x_coor
-        original_y_coor = self.y_coor
-        if event.key == pygame.K_DOWN and "DOWN" in self.available_directions:
-            self.y_coor += HCV.MOVE_Y
-            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-            self.last_move = "DOWN"
-        if event.key == pygame.K_UP and "UP" in self.available_directions:
-            self.y_coor -= HCV.MOVE_Y
-            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-            self.last_move = "UP"
-        if event.key == pygame.K_LEFT and "LEFT" in self.available_directions:
-            self.x_coor -= HCV.MOVE_X
-            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-            self.last_move = "LEFT"
-        if event.key == pygame.K_RIGHT and "RIGHT" in self.available_directions:
-            self.x_coor += HCV.MOVE_X
-            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-            self.last_move = "RIGHT"
-        return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor, original_x_coor, original_y_coor
+    # def move_snowplow(self, event):
+    #     original_x_coor = self.x_coor
+    #     original_y_coor = self.y_coor
+    #     if event.key == pygame.K_DOWN and "DOWN" in self.available_directions:
+    #         self.y_coor += HCV.MOVE_Y
+    #         self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+    #         self.last_move = "DOWN"
+    #     if event.key == pygame.K_UP and "UP" in self.available_directions:
+    #         self.y_coor -= HCV.MOVE_Y
+    #         self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+    #         self.last_move = "UP"
+    #     if event.key == pygame.K_LEFT and "LEFT" in self.available_directions:
+    #         self.x_coor -= HCV.MOVE_X
+    #         self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+    #         self.last_move = "LEFT"
+    #     if event.key == pygame.K_RIGHT and "RIGHT" in self.available_directions:
+    #         self.x_coor += HCV.MOVE_X
+    #         self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+    #         self.last_move = "RIGHT"
+    #     return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor, original_x_coor, original_y_coor
 
     def available_directions_for_next_move(self, grid_x, grid_y):
         # Remove the last movement direction from list of available moves, so snowplow doesnt continue into barrier
@@ -102,105 +102,99 @@ class Snowplow:
                 if collision_detected:
                     self.available_directions.remove("Right")
 
-    def path_finding(self, snowflake_coors):
-        snow_coors = snowflake_coors
-        print("Available Directions: ", self.available_directions)
-        for i in self.available_directions:
-            if i == "DOWN":
-                x = self.grid_x_coor
-                y = self.grid_y_coor
-                coor = [x, y]
-                snow_removed = 0
-                distance_travelled = 0
-                collision = False
-                while not collision:
-                    if coor in snow_coors:
-                        snow_removed += 1
-                        snow_coors.remove(coor)
+    def loop_till_collision(self, inc_x, inc_y, coors):
+        snow_coors = coors[:]  # Copy list this way so changes made to copy don't affect original
+        x = self.grid_x_coor
+        y = self.grid_y_coor
+        coor = [x, y]
+        snow_collected = 0
+        snow_collection_point_multiplier = 2
+        distance_travelled = 0
+        collision = False
+        while not collision:
+            if coor in snow_coors:
+                snow_collected += 1 * snow_collection_point_multiplier
+                snow_coors.remove(coor)
 
-                    y += 1
-                    distance_travelled += 1
-                    coor = [x, y]
-                    collision = self.detect_collision(x, y)
+            x += inc_x
+            y += inc_y
+            distance_travelled += 1
+            coor = [x, y]
+            collision = self.detect_collision(x, y)
 
-                if coor in snow_coors:
-                    snow_removed += 1
-                    snow_coors.remove(coor)
+        if coor in snow_coors:
+            snow_collected += 1 * snow_collection_point_multiplier
+            snow_coors.remove(coor)
 
-                score_down = snow_removed - distance_travelled
-                print("DOWN:", score_down, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
+        score_down = snow_collected - distance_travelled
+        return score_down, snow_collected, distance_travelled, coor
 
-            elif i == "UP":
-                x = self.grid_x_coor
-                y = self.grid_y_coor
-                coor = [x, y]
-                snow_removed = 0
-                distance_travelled = 0
-                collision = False
-                while not collision:
-                    if coor in snow_coors:
-                        snow_removed += 1
-                        snow_coors.remove(coor)
+    def greedy_algorithm(self, coors):
+        snowflake_coors = coors[:]
+        scores = {"DOWN": -9999, "UP": -9999, "LEFT": -9999, "RIGHT": -9999}
+        snow_collection = {"DOWN": -9999, "UP": -9999, "LEFT": -9999, "RIGHT": -9999}
+        distances = {"DOWN": 9999, "UP": 9999, "LEFT": 9999, "RIGHT": 9999}
+        end_coors = {"DOWN": [0, 0], "UP": [0, 0], "LEFT": [0, 0], "RIGHT": [0, 0]}
+        if "DOWN" in self.available_directions:
+            score_down, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=0, inc_y=1, coors=snowflake_coors)
+            scores['DOWN'] = score_down
+            snow_collection['DOWN'] = snow_collected
+            distances['DOWN'] = distance_travelled
+            end_coors['DOWN'] = end_coor
+        if "UP" in self.available_directions:
+            score_up, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=0, inc_y=-1, coors=snowflake_coors)
+            scores['UP'] = score_up
+            snow_collection['UP'] = snow_collected
+            distances['UP'] = distance_travelled
+            end_coors['UP'] = end_coor
+        if "LEFT" in self.available_directions:
+            score_left, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=-1, inc_y=0, coors=snowflake_coors)
+            scores['LEFT'] = score_left
+            snow_collection['LEFT'] = snow_collected
+            distances['LEFT'] = distance_travelled
+            end_coors['LEFT'] = end_coor
+        if "RIGHT" in self.available_directions:
+            score_right, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=1, inc_y=0, coors=snowflake_coors)
+            scores['RIGHT'] = score_right
+            snow_collection['RIGHT'] = snow_collected
+            distances['RIGHT'] = distance_travelled
+            end_coors['RIGHT'] = end_coor
 
-                    y -= 1
-                    distance_travelled += 1
-                    coor = [x, y]
-                    collision = self.detect_collision(x, y)
+        direction = max(scores, key=scores.get)
+        num_of_moves = distances[direction]
+        print('------------------------------------------------')
+        print('Scores:', scores)
+        print('Snow collected:', snow_collection)
+        print('Distances:', distances)
+        print('End Pos:', end_coors)
+        print('Move:', direction, ' ', 'Spaces:', num_of_moves)
+        print('Available Directions:', self.available_directions)
+        print('------------------------------------------------')
+        print('\n')
+        return direction, num_of_moves
 
-                if coor in snow_coors:
-                    snow_removed += 1
-                    snow_coors.remove(coor)
+    def greedy_move_snowplow(self, next_direction):
+        if next_direction == "DOWN":
+            self.y_coor += HCV.MOVE_Y
+            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.last_move = "DOWN"
+        elif next_direction == "UP":
+            self.y_coor -= HCV.MOVE_Y
+            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.last_move = "UP"
+        elif next_direction == "LEFT":
+            self.x_coor -= HCV.MOVE_X
+            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.last_move = "LEFT"
+        else:  # next_direction == "RIGHT"
+            self.x_coor += HCV.MOVE_X
+            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.last_move = "RIGHT"
+        print('Collision:', self.collision, self.grid_x_coor, self.grid_y_coor)
+        # return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor
 
-                score_up = snow_removed - distance_travelled
-                print("UP:", score_up, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
-
-            elif i == "LEFT":
-                x = self.grid_x_coor
-                y = self.grid_y_coor
-                coor = [x, y]
-                snow_removed = 0
-                distance_travelled = 0
-                collision = False
-                while not collision:
-                    if coor in snow_coors:
-                        snow_removed += 1
-                        snow_coors.remove(coor)
-
-                    x -= 1
-                    distance_travelled += 1
-                    coor = [x, y]
-                    collision = self.detect_collision(x, y)
-
-                if coor in snow_coors:
-                    snow_removed += 1
-                    snow_coors.remove(coor)
-
-                score_left = snow_removed - distance_travelled
-                print("LEFT:", score_left, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
-
-            else:
-                x = self.grid_x_coor
-                y = self.grid_y_coor
-                coor = [x, y]
-                snow_removed = 0
-                distance_travelled = 0
-                collision = False
-                while not collision:
-                    if coor in snow_coors:
-                        snow_removed += 1
-                        snow_coors.remove(coor)
-
-                    x += 1
-                    distance_travelled += 1
-                    coor = [x, y]
-                    collision = self.detect_collision(x, y)
-
-                if coor in snow_coors:
-                    snow_removed += 1
-                    snow_coors.remove(coor)
-
-                score_right = snow_removed - distance_travelled
-                print("RIGHT:", score_right, "Snow:", snow_removed, "Distance:", distance_travelled, "Coor:", coor)
+    def dynamic_programming(self, coors):
+        pass
 
 # Ideally every move should remove a snowflake
 # Remove all snowflakes
