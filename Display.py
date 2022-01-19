@@ -35,13 +35,11 @@ class Display:
         if coor in self.snowflake.snowflake_coors:
             self.snowflake.snowflake_coors.remove(coor)
             self.stats.amount_of_snow_moved += 1
-        return self.snowflake.snowflake_coors
 
     def run(self):
         running = True
         while running:
             for event in pygame.event.get():
-                # Quit
                 if event.type == pygame.QUIT:
                     running = False
 
@@ -49,58 +47,43 @@ class Display:
                 if event.type == pygame.MOUSEBUTTONDOWN and not self.snowplow.start_pos_set:
                     self.snowplow.get_start_pos()
                     self.draw_background()
-                    self.snowplow.draw_snowplow(self.snowplow.x_start, self.snowplow.y_start)
+                    self.snowplow.draw(self.snowplow.x_start, self.snowplow.y_start)
+                    self.remove_snow(self.snowplow.grid_x, self.snowplow.grid_y)
 
                 # Move snowplow
                 if event.type == pygame.KEYDOWN:
                     direction, num_of_moves = self.snowplow.greedy_algorithm(self.snowflake.snowflake_coors)
                     for i in range(num_of_moves):
-                        self.snowplow.greedy_move_snowplow(direction)
-                        collision = self.snowplow.detect_collision(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
-                        if not collision:
-                            self.draw_background()
-                            self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
-                            self.stats.distance_travelled += 1
-                            self.snowplow.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
-                        else:
-                            self.snowplow.last_move = direction
-                            self.draw_background()
-                            self.snowplow.draw_snowplow(self.snowplow.x_coor, self.snowplow.y_coor)
-                            self.snowpile.update_snowpile_coors(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
-                            self.stats.collisions += 1
-                            self.stats.points += self.stats.amount_of_snow_moved
-                            self.stats.amount_of_snow_moved = 0
-                            self.snowplow.available_directions_for_next_move(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
+                        self.snowplow.greedy_movement(direction)
+                        self.stats.distance_travelled += 1  # Update distance score
+                        self.draw_background()
+                        self.snowplow.draw(self.snowplow.x, self.snowplow.y)
+                        collision = self.snowplow.detect_collision(self.snowplow.grid_x, self.snowplow.grid_y)
 
-                        self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
-                        self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
-                        self.stats.snowpiles = len(self.snowpile.snowpile_coors)
-                        self.snowpile.draw_snowpiles(self.snowpile.snowpile_coors)
+                        if collision:
+                            self.stats.collisions += 1  # Update collision score
+                            # Check if the snowplow removed any snow before making the snowpile
+                            if self.stats.amount_of_snow_moved > 0:
+                                self.stats.total_removed += self.stats.amount_of_snow_moved
+                                self.snowpile.add_coor(self.snowplow.grid_x, self.snowplow.grid_y)
+                                self.stats.amount_of_snow_moved = 0
+
+                            self.draw_background()
+                            self.snowplow.draw(self.snowplow.x, self.snowplow.y)
+                            self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
+
+                        # Update display
+                        self.remove_snow(self.snowplow.grid_x, self.snowplow.grid_y)
+                        self.snowflake.draw(self.snowflake.snowflake_coors)
+                        self.snowpile.draw(self.snowpile.coors)
+
+                        # Update snowpile score
+                        self.stats.snowpiles = len(self.snowpile.coors)
                         self.stats.display_info(self.font)
-                        self.draw_grid()
 
-                # if event.type == pygame.KEYDOWN:
-                    # pix_x, pix_y, grid_x, grid_y, original_x_coor, original_y_coor = self.snowplow.move_snowplow(event)
-                    # collision_detected = self.snowplow.detect_collision(grid_x, grid_y)
-                    # if not collision_detected:
-                    #     self.draw_background()
-                    #     self.snowplow.draw_snowplow(pix_x, pix_y)
-                    #     self.stats.distance_travelled += 1
-                    #     self.snowplow.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
-                    # else:
-                    #     self.draw_background()
-                    #     self.snowplow.draw_snowplow(pix_x, pix_y)
-                    #     self.snowpile.update_snowpile_coors(grid_x, grid_y)
-                    #     self.stats.collisions += 1
-                    #     self.stats.points += self.stats.amount_of_snow_moved
-                    #     self.stats.amount_of_snow_moved = 0
-                    #     self.snowplow.available_directions_for_next_move(grid_x, grid_y)
-
-                self.snowflake.snowflake_coors = self.remove_snow(self.snowplow.grid_x_coor, self.snowplow.grid_y_coor)
-                self.snowflake.draw_snowflakes(self.snowflake.snowflake_coors)
-                self.stats.snowpiles = len(self.snowpile.snowpile_coors)
-                self.snowpile.draw_snowpiles(self.snowpile.snowpile_coors)
-                self.stats.display_info(self.font)
+                # Refresh screen
+                self.snowflake.draw(self.snowflake.snowflake_coors)
+                self.snowpile.draw(self.snowpile.coors)
                 self.draw_grid()
 
                 pygame.display.update()

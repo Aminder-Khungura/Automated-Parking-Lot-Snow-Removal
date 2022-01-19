@@ -1,6 +1,5 @@
 import pygame
 import HARD_CODED_VALUES as HCV
-import Stats
 import Barriers
 
 
@@ -13,32 +12,31 @@ class Snowplow:
         self.collision = False
         self.x_start = 0
         self.y_start = 0
-        self.x_coor = 0
-        self.y_coor = 0
+        self.x = 0
+        self.y = 0
         self.grid_x_start = 0
         self.grid_y_start = 0
-        self.grid_x_coor = 0
-        self.grid_y_coor = 0
-        self.stats = Stats.Stats(self.parent_screen)
+        self.grid_x = 0
+        self.grid_y = 0
         self.start_pos_set = False
         self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
         self.last_move = "NONE"
 
     # Store the pixel and grid coordinates of the snowplow starting location
     def get_start_pos(self):
-        self.x_coor, self.y_coor = pygame.mouse.get_pos()
-        self.x_coor -= HCV.SNOWPLOW_IMG_OFFSET
-        self.y_coor -= HCV.SNOWPLOW_IMG_OFFSET
-        self.x_start = self.x_coor
-        self.y_start = self.y_coor
+        self.x, self.y = pygame.mouse.get_pos()
+        self.x -= HCV.SNOWPLOW_IMG_OFFSET
+        self.y -= HCV.SNOWPLOW_IMG_OFFSET
+        self.x_start = self.x
+        self.y_start = self.y
         self.grid_x_start = (self.x_start + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
         self.grid_y_start = (self.y_start + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-        self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-        self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+        self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+        self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
         self.start_pos_set = True
-        self.available_directions_for_next_move(self.grid_x_start, self.grid_y_start)
+        self.get_available_directions(self.grid_x_start, self.grid_y_start)
 
-    def draw_snowplow(self, x, y):
+    def draw(self, x, y):
         self.parent_screen.blit(self.snowplow_character, [x, y])
 
     def detect_collision(self, grid_x, grid_y):
@@ -49,63 +47,41 @@ class Snowplow:
             self.collision = False
         return self.collision
 
-    # def move_snowplow(self, event):
-    #     original_x_coor = self.x_coor
-    #     original_y_coor = self.y_coor
-    #     if event.key == pygame.K_DOWN and "DOWN" in self.available_directions:
-    #         self.y_coor += HCV.MOVE_Y
-    #         self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-    #         self.last_move = "DOWN"
-    #     if event.key == pygame.K_UP and "UP" in self.available_directions:
-    #         self.y_coor -= HCV.MOVE_Y
-    #         self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
-    #         self.last_move = "UP"
-    #     if event.key == pygame.K_LEFT and "LEFT" in self.available_directions:
-    #         self.x_coor -= HCV.MOVE_X
-    #         self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-    #         self.last_move = "LEFT"
-    #     if event.key == pygame.K_RIGHT and "RIGHT" in self.available_directions:
-    #         self.x_coor += HCV.MOVE_X
-    #         self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
-    #         self.last_move = "RIGHT"
-    #     return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor, original_x_coor, original_y_coor
-
-    def available_directions_for_next_move(self, grid_x, grid_y):
+    def get_available_directions(self, grid_x, grid_y):
+        self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
         # Remove the last movement direction from list of available moves, so snowplow doesnt continue into barrier
         if self.last_move in self.available_directions:
             self.available_directions.remove(self.last_move)
-
         # Check which directions you can move without having another collision, remove the directions that will result in collision from available moves
-        for i in self.available_directions:
-            if i == "DOWN":
-                x = grid_x
-                y = grid_y + 1
-                collision_detected = self.detect_collision(x, y)
-                if collision_detected:
-                    self.available_directions.remove("DOWN")
-            if i == "UP":
-                x = grid_x
-                y = grid_y - 1
-                collision_detected = self.detect_collision(x, y)
-                if collision_detected:
-                    self.available_directions.remove("UP")
-            if i == "LEFT":
-                x = grid_x - 1
-                y = grid_y
-                collision_detected = self.detect_collision(x, y)
-                if collision_detected:
-                    self.available_directions.remove("LEFT")
-            if i == "Right":
-                x = grid_x + 1
-                y = grid_y
-                collision_detected = self.detect_collision(x, y)
-                if collision_detected:
-                    self.available_directions.remove("Right")
+        if "DOWN" in self.available_directions:
+            x = grid_x
+            y = grid_y + 1
+            collision_detected = self.detect_collision(x, y)
+            if collision_detected:
+                self.available_directions.remove("DOWN")
+        if "UP" in self.available_directions:
+            x = grid_x
+            y = grid_y - 1
+            collision_detected = self.detect_collision(x, y)
+            if collision_detected:
+                self.available_directions.remove("UP")
+        if "LEFT" in self.available_directions:
+            x = grid_x - 1
+            y = grid_y
+            collision_detected = self.detect_collision(x, y)
+            if collision_detected:
+                self.available_directions.remove("LEFT")
+        if "RIGHT" in self.available_directions:
+            x = grid_x + 1
+            y = grid_y
+            collision_detected = self.detect_collision(x, y)
+            if collision_detected:
+                self.available_directions.remove("RIGHT")
 
     def loop_till_collision(self, inc_x, inc_y, coors):
         snow_coors = coors[:]  # Copy list this way so changes made to copy don't affect original
-        x = self.grid_x_coor
-        y = self.grid_y_coor
+        x = self.grid_x
+        y = self.grid_y
         coor = [x, y]
         snow_collected = 0
         snow_collection_point_multiplier = 2
@@ -173,25 +149,23 @@ class Snowplow:
         print('\n')
         return direction, num_of_moves
 
-    def greedy_move_snowplow(self, next_direction):
+    def greedy_movement(self, next_direction):
         if next_direction == "DOWN":
-            self.y_coor += HCV.MOVE_Y
-            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.y += HCV.MOVE_Y
+            self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
             self.last_move = "DOWN"
         elif next_direction == "UP":
-            self.y_coor -= HCV.MOVE_Y
-            self.grid_y_coor = (self.y_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.y -= HCV.MOVE_Y
+            self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
             self.last_move = "UP"
         elif next_direction == "LEFT":
-            self.x_coor -= HCV.MOVE_X
-            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.x -= HCV.MOVE_X
+            self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
             self.last_move = "LEFT"
         else:  # next_direction == "RIGHT"
-            self.x_coor += HCV.MOVE_X
-            self.grid_x_coor = (self.x_coor + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.x += HCV.MOVE_X
+            self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
             self.last_move = "RIGHT"
-        print('Collision:', self.collision, self.grid_x_coor, self.grid_y_coor)
-        # return self.x_coor, self.y_coor, self.grid_x_coor, self.grid_y_coor
 
     def dynamic_programming(self, coors):
         pass
@@ -210,4 +184,3 @@ class Snowplow:
 
 # Calculate GRADE for paths (i.e. from boundary cell to perpendicular boundary cell), these two cells will have the same score therefore can save scores to speed up process
 # GRADE = Score - Distance Travelled
-

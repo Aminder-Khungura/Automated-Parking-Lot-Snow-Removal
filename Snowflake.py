@@ -6,15 +6,15 @@ import Barriers
 class Snowflake:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
-        self.snowflake_character = pygame.image.load('snowflake.png').convert_alpha()
-        self.snowflake_character = pygame.transform.scale(self.snowflake_character, (HCV.X_TRANSFORM, HCV.Y_TRANSFORM))
+        self.character = pygame.image.load('snowflake.png').convert_alpha()
+        self.character = pygame.transform.scale(self.character, (HCV.X_TRANSFORM, HCV.Y_TRANSFORM))
         self.possible_coors = [[0] * 2] * (HCV.GRID_ROWS * HCV.GRID_COLS)
         self.possible_coors = self.get_possible_coors()
         self.pix_x = 0
         self.pix_y = 0
         self.barriers = Barriers.Barriers(self.parent_screen)
         self.parkinglot_coors = self.get_parkinglot_coors()
-        self.snowflake_coors = self.parkinglot_coors
+        self.snowflake_coors = self.parkinglot_coors[:]
 
     def get_possible_coors(self):
         array_index = 0
@@ -71,10 +71,10 @@ class Snowflake:
 
         return self.parkinglot_coors
 
-    def draw_snowflakes(self, arr):
+    def draw(self, arr):
         for i in arr:
             coor = i
             # Convert grid coordinates to pixel coordinates
             self.pix_x = coor[0] * HCV.BLOCK_WIDTH
             self.pix_y = coor[1] * HCV.BLOCK_WIDTH
-            self.parent_screen.blit(self.snowflake_character, [self.pix_x, self.pix_y])
+            self.parent_screen.blit(self.character, [self.pix_x, self.pix_y])
