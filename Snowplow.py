@@ -84,7 +84,7 @@ class Snowplow:
         y = self.grid_y
         coor = [x, y]
         snow_collected = 0
-        snow_collection_point_multiplier = 2
+        snow_collection_point_multiplier = 12
         distance_travelled = 0
         collision = False
         while not collision:
@@ -137,16 +137,15 @@ class Snowplow:
             end_coors['RIGHT'] = end_coor
 
         direction = max(scores, key=scores.get)
-        num_of_moves = distances[direction]
-        print('------------------------------------------------')
+        # Check if this move collects any snow, if it does not just move 1 cell in the direction selected above.
+        # Done to prevent snowplow from getting stuck moving back and forth
+        if snow_collection[direction] != 0:
+            num_of_moves = distances[direction]
+        else:
+            num_of_moves = 1
+            self.last_move = "NONE"  # This will allow "get_available_directions" to reevaluate possible moves after the one cell adjustment
+        print(direction)
         print('Scores:', scores)
-        print('Snow collected:', snow_collection)
-        print('Distances:', distances)
-        print('End Pos:', end_coors)
-        print('Move:', direction, ' ', 'Spaces:', num_of_moves)
-        print('Available Directions:', self.available_directions)
-        print('------------------------------------------------')
-        print('\n')
         return direction, num_of_moves
 
     def greedy_movement(self, next_direction):

@@ -11,8 +11,8 @@ class Display:
         pygame.init()
         self.screen = pygame.display.set_mode((HCV.SCREEN_WIDTH, HCV.SCREEN_HEIGHT))
         pygame.display.set_caption("Parking Lot Snow Removal Visualization")
-        self.icon = pygame.image.load('snowplow.png')
-        pygame.display.set_icon(self.icon)
+        icon = pygame.image.load('snowplow.png')
+        pygame.display.set_icon(icon)
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
         self.screen.blit(self.background_image, [0, 0])
         self.snowplow = Snowplow.Snowplow(self.screen)
@@ -52,6 +52,9 @@ class Display:
 
                 # Move snowplow
                 if event.type == pygame.KEYDOWN:
+                    print(self.snowplow.grid_x, self.snowplow.grid_y)
+                    self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
+                    print('Available Directions:', self.snowplow.available_directions)
                     direction, num_of_moves = self.snowplow.greedy_algorithm(self.snowflake.snowflake_coors)
                     for i in range(num_of_moves):
                         self.snowplow.greedy_movement(direction)
@@ -67,7 +70,7 @@ class Display:
                                 self.stats.total_removed += self.stats.amount_of_snow_moved
                                 self.snowpile.add_coor(self.snowplow.grid_x, self.snowplow.grid_y)
                                 self.stats.amount_of_snow_moved = 0
-
+                            self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                             self.draw_background()
                             self.snowplow.draw(self.snowplow.x, self.snowplow.y)
                             self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
@@ -85,5 +88,4 @@ class Display:
                 self.snowflake.draw(self.snowflake.snowflake_coors)
                 self.snowpile.draw(self.snowpile.coors)
                 self.draw_grid()
-
                 pygame.display.update()
