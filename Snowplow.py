@@ -144,10 +144,13 @@ class Snowplow:
         else:
             print('There is No snow available at this position.')
             coors_to_check = self.get_coors_to_check()
-            print('Re-evaluate at the following coordinates:', coors_to_check )
+            print('Re-evaluate @', coors_to_check)
             results = self.find_snow(coors_to_check, snowflake_coors)
-            direction = max(results, key=results.get)
+            print('Results:', results)
+            direction = min(results, key=results.get)
             num_of_moves = results[direction]
+            if num_of_moves == 9999:
+                num_of_moves = 1
         print('Move:', direction, num_of_moves, ' spaces.')
         print('Scores:', scores)
         print('-----------------------------------------------------------')
@@ -205,25 +208,34 @@ class Snowplow:
     def find_snow(self, coors_to_check, coors):
         results = {}
         snowflake_coors = coors[:]
+        snow_found = False
         for key in coors_to_check:
             coor = coors_to_check[key]
             x = coor[0]
             y = coor[1]
-            distance_travelled = 0
             self.last_move = 'NONE'  # Because there was no collision we set last move to 'None'
             self.get_available_directions(x, y)
+            print('Check available directions @', coor)
+            results[key] = 9999
             if "DOWN" in self.available_directions:
-                distance_travelled = self.loop_till_snow(x, y, inc_x=0, inc_y=1,coors=snowflake_coors)
+                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=0, inc_y=1, coors=snowflake_coors, direction="DOWN")
+                if distance_travelled < results[key]:
+                    results[key] = distance_travelled
             if "UP" in self.available_directions:
-                distance_travelled = self.loop_till_snow(x, y, inc_x=0, inc_y=-1, coors=snowflake_coors)
+                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=0, inc_y=-1, coors=snowflake_coors, direction="UP")
+                if distance_travelled < results[key]:
+                    results[key] = distance_travelled
             if "LEFT" in self.available_directions:
-                distance_travelled = self.loop_till_snow(x, y, inc_x=-1, inc_y=0, coors=snowflake_coors)
+                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=-1, inc_y=0, coors=snowflake_coors, direction="LEFT")
+                if distance_travelled < results[key]:
+                    results[key] = distance_travelled
             if "RIGHT" in self.available_directions:
-                distance_travelled = self.loop_till_snow(x, y, inc_x=1, inc_y=0, coors=snowflake_coors)
-            results[key] = distance_travelled
-        return results
+                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=1, inc_y=0, coors=snowflake_coors, direction="RIGHT")
+                if distance_travelled < results[key]:
+                    results[key] = distance_travelled
+        return results, snow_found
 
-    def loop_till_snow(self, x, y, inc_x, inc_y, coors):
+    def loop_till_snow(self, x, y, inc_x, inc_y, coors, direction):
         snowflake_coors = coors[:]  # Copy list this way so changes made to copy don't affect original
         coor = [x, y]
         looking_for_snow = True
@@ -242,11 +254,11 @@ class Snowplow:
                 if collision:
                     looking_for_snow = False
         if snow_found:
-            print('FOUND SNOW ', '@', coor)
+            print('FOUND SNOW', '@', direction, coor)
         else:
             distance_travelled = 9999
-            print('FAILED ', '@', coor)
-        return distance_travelled
+            print('FAILED', '@', direction, coor)
+        return distance_travelled, snow_found
 
     def dynamic_programming(self, coors):
         pass
