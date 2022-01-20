@@ -52,7 +52,7 @@ class Display:
 
                 # Move snowplow
                 if event.type == pygame.KEYDOWN:
-                    print(self.snowplow.grid_x, self.snowplow.grid_y)
+                    print('Start pos:', self.snowplow.grid_x, self.snowplow.grid_y)
                     self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                     print('Available Directions:', self.snowplow.available_directions)
                     direction, num_of_moves = self.snowplow.greedy_algorithm(self.snowflake.snowflake_coors)

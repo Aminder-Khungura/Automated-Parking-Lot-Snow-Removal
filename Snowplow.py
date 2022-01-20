@@ -20,7 +20,7 @@ class Snowplow:
         self.grid_y = 0
         self.start_pos_set = False
         self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
-        self.last_move = "NONE"
+        self.last_move = 'NONE'
 
     # Store the pixel and grid coordinates of the snowplow starting location
     def get_start_pos(self):
@@ -139,13 +139,19 @@ class Snowplow:
         direction = max(scores, key=scores.get)
         # Check if this move collects any snow, if it does not just move 1 cell in the direction selected above.
         # Done to prevent snowplow from getting stuck moving back and forth
-        if snow_collection[direction] != 0:
+        if snow_collection[direction] > 0:
             num_of_moves = distances[direction]
         else:
-            num_of_moves = 1
-            self.last_move = "NONE"  # This will allow "get_available_directions" to reevaluate possible moves after the one cell adjustment
-        print(direction)
+            print('There is No snow available at this position.')
+            coors_to_check = self.get_coors_to_check()
+            print('Re-evaluate at the following coordinates:', coors_to_check )
+            results = self.find_snow(coors_to_check, snowflake_coors)
+            direction = max(results, key=results.get)
+            num_of_moves = results[direction]
+        print('Move:', direction, num_of_moves, ' spaces.')
         print('Scores:', scores)
+        print('-----------------------------------------------------------')
+        print('-----------------------------------------------------------')
         return direction, num_of_moves
 
     def greedy_movement(self, next_direction):
@@ -166,8 +172,85 @@ class Snowplow:
             self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
             self.last_move = "RIGHT"
 
+    def get_coors_to_check(self):
+        x = self.grid_x
+        y = self.grid_y
+        coors_to_check = {}
+        if "DOWN" in self.available_directions:
+            inc_x = 0
+            inc_y = 1
+            new_x = x + inc_x
+            new_y = y + inc_y
+            coors_to_check["DOWN"] = [new_x, new_y]
+        if "UP" in self.available_directions:
+            inc_x = 0
+            inc_y = -1
+            new_x = x + inc_x
+            new_y = y + inc_y
+            coors_to_check["UP"] = [new_x, new_y]
+        if "LEFT" in self.available_directions:
+            inc_x = -1
+            inc_y = 0
+            new_x = x + inc_x
+            new_y = y + inc_y
+            coors_to_check["LEFT"] = [new_x, new_y]
+        if "RIGHT" in self.available_directions:
+            inc_x = 1
+            inc_y = 0
+            new_x = x + inc_x
+            new_y = y + inc_y
+            coors_to_check["RIGHT"] = [new_x, new_y]
+        return coors_to_check
+
+    def find_snow(self, coors_to_check, coors):
+        results = {}
+        snowflake_coors = coors[:]
+        for key in coors_to_check:
+            coor = coors_to_check[key]
+            x = coor[0]
+            y = coor[1]
+            distance_travelled = 0
+            self.last_move = 'NONE'  # Because there was no collision we set last move to 'None'
+            self.get_available_directions(x, y)
+            if "DOWN" in self.available_directions:
+                distance_travelled = self.loop_till_snow(x, y, inc_x=0, inc_y=1,coors=snowflake_coors)
+            if "UP" in self.available_directions:
+                distance_travelled = self.loop_till_snow(x, y, inc_x=0, inc_y=-1, coors=snowflake_coors)
+            if "LEFT" in self.available_directions:
+                distance_travelled = self.loop_till_snow(x, y, inc_x=-1, inc_y=0, coors=snowflake_coors)
+            if "RIGHT" in self.available_directions:
+                distance_travelled = self.loop_till_snow(x, y, inc_x=1, inc_y=0, coors=snowflake_coors)
+            results[key] = distance_travelled
+        return results
+
+    def loop_till_snow(self, x, y, inc_x, inc_y, coors):
+        snowflake_coors = coors[:]  # Copy list this way so changes made to copy don't affect original
+        coor = [x, y]
+        looking_for_snow = True
+        snow_found = False
+        distance_travelled = 0
+        while looking_for_snow:
+            if coor in snowflake_coors:
+                snow_found = True
+                looking_for_snow = False
+            else:
+                x += inc_x
+                y += inc_y
+                distance_travelled += 1
+                coor = [x, y]
+                collision = self.detect_collision(x, y)
+                if collision:
+                    looking_for_snow = False
+        if snow_found:
+            print('FOUND SNOW ', '@', coor)
+        else:
+            distance_travelled = 9999
+            print('FAILED ', '@', coor)
+        return distance_travelled
+
     def dynamic_programming(self, coors):
         pass
+
 
 # Ideally every move should remove a snowflake
 # Remove all snowflakes
