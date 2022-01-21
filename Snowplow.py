@@ -208,7 +208,6 @@ class Snowplow:
     def find_snow(self, coors_to_check, coors):
         results = {}
         snowflake_coors = coors[:]
-        snow_found = False
         for key in coors_to_check:
             coor = coors_to_check[key]
             x = coor[0]
@@ -218,22 +217,22 @@ class Snowplow:
             print('Check available directions @', coor)
             results[key] = 9999
             if "DOWN" in self.available_directions:
-                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=0, inc_y=1, coors=snowflake_coors, direction="DOWN")
+                distance_travelled = self.loop_till_snow(x, y, inc_x=0, inc_y=1, coors=snowflake_coors, direction="DOWN")
                 if distance_travelled < results[key]:
                     results[key] = distance_travelled
             if "UP" in self.available_directions:
-                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=0, inc_y=-1, coors=snowflake_coors, direction="UP")
+                distance_travelled = self.loop_till_snow(x, y, inc_x=0, inc_y=-1, coors=snowflake_coors, direction="UP")
                 if distance_travelled < results[key]:
                     results[key] = distance_travelled
             if "LEFT" in self.available_directions:
-                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=-1, inc_y=0, coors=snowflake_coors, direction="LEFT")
+                distance_travelled = self.loop_till_snow(x, y, inc_x=-1, inc_y=0, coors=snowflake_coors, direction="LEFT")
                 if distance_travelled < results[key]:
                     results[key] = distance_travelled
             if "RIGHT" in self.available_directions:
-                distance_travelled, snow_found = self.loop_till_snow(x, y, inc_x=1, inc_y=0, coors=snowflake_coors, direction="RIGHT")
+                distance_travelled = self.loop_till_snow(x, y, inc_x=1, inc_y=0, coors=snowflake_coors, direction="RIGHT")
                 if distance_travelled < results[key]:
                     results[key] = distance_travelled
-        return results, snow_found
+            return results
 
     def loop_till_snow(self, x, y, inc_x, inc_y, coors, direction):
         snowflake_coors = coors[:]  # Copy list this way so changes made to copy don't affect original
@@ -258,7 +257,7 @@ class Snowplow:
         else:
             distance_travelled = 9999
             print('FAILED', '@', direction, coor)
-        return distance_travelled, snow_found
+        return distance_travelled
 
     def dynamic_programming(self, coors):
         pass
