@@ -50,33 +50,28 @@ class Snowplow:
     def get_available_directions(self, grid_x, grid_y):
         self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
         # Remove the last movement direction from list of available moves, so snowplow doesnt continue into barrier
-        if self.last_move in self.available_directions:
+        if self.last_move in self.available_directions and self.collision:
             self.available_directions.remove(self.last_move)
         # Check which directions you can move without having another collision, remove the directions that will result in collision from available moves
-        if "DOWN" in self.available_directions:
-            x = grid_x
-            y = grid_y + 1
+        for i in self.available_directions:
+            if "DOWN" == i:
+                x = grid_x
+                y = grid_y + 1
+            elif "UP" == i:
+                x = grid_x
+                y = grid_y - 1
+            elif "LEFT" == i:
+                x = grid_x - 1
+                y = grid_y
+            elif "RIGHT" == i:
+                x = grid_x + 1
+                y = grid_y
+            else:
+                print('ERROR --- NO AVAILABLE DIRECTIONS TO MOVE')
+                x, y = 0, 0
             collision_detected = self.detect_collision(x, y)
             if collision_detected:
-                self.available_directions.remove("DOWN")
-        if "UP" in self.available_directions:
-            x = grid_x
-            y = grid_y - 1
-            collision_detected = self.detect_collision(x, y)
-            if collision_detected:
-                self.available_directions.remove("UP")
-        if "LEFT" in self.available_directions:
-            x = grid_x - 1
-            y = grid_y
-            collision_detected = self.detect_collision(x, y)
-            if collision_detected:
-                self.available_directions.remove("LEFT")
-        if "RIGHT" in self.available_directions:
-            x = grid_x + 1
-            y = grid_y
-            collision_detected = self.detect_collision(x, y)
-            if collision_detected:
-                self.available_directions.remove("RIGHT")
+                self.available_directions.remove(i)
 
     def loop_till_collision(self, inc_x, inc_y, coors):
         snow_coors = coors[:]  # Copy list this way so changes made to copy don't affect original
@@ -91,50 +86,39 @@ class Snowplow:
             if coor in snow_coors:
                 snow_collected += 1 * snow_collection_point_multiplier
                 snow_coors.remove(coor)
-
             x += inc_x
             y += inc_y
             distance_travelled += 1
             coor = [x, y]
             collision = self.detect_collision(x, y)
-
         if coor in snow_coors:
             snow_collected += 1 * snow_collection_point_multiplier
             snow_coors.remove(coor)
-
         score_down = snow_collected - distance_travelled
         return score_down, snow_collected, distance_travelled, coor
 
     def greedy_algorithm(self, coors):
         snowflake_coors = coors[:]
-        scores = {"DOWN": -9999, "UP": -9999, "LEFT": -9999, "RIGHT": -9999}
-        snow_collection = {"DOWN": -9999, "UP": -9999, "LEFT": -9999, "RIGHT": -9999}
-        distances = {"DOWN": 9999, "UP": 9999, "LEFT": 9999, "RIGHT": 9999}
-        end_coors = {"DOWN": [0, 0], "UP": [0, 0], "LEFT": [0, 0], "RIGHT": [0, 0]}
-        if "DOWN" in self.available_directions:
-            score_down, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=0, inc_y=1, coors=snowflake_coors)
-            scores['DOWN'] = score_down
-            snow_collection['DOWN'] = snow_collected
-            distances['DOWN'] = distance_travelled
-            end_coors['DOWN'] = end_coor
-        if "UP" in self.available_directions:
-            score_up, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=0, inc_y=-1, coors=snowflake_coors)
-            scores['UP'] = score_up
-            snow_collection['UP'] = snow_collected
-            distances['UP'] = distance_travelled
-            end_coors['UP'] = end_coor
-        if "LEFT" in self.available_directions:
-            score_left, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=-1, inc_y=0, coors=snowflake_coors)
-            scores['LEFT'] = score_left
-            snow_collection['LEFT'] = snow_collected
-            distances['LEFT'] = distance_travelled
-            end_coors['LEFT'] = end_coor
-        if "RIGHT" in self.available_directions:
-            score_right, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=1, inc_y=0, coors=snowflake_coors)
-            scores['RIGHT'] = score_right
-            snow_collection['RIGHT'] = snow_collected
-            distances['RIGHT'] = distance_travelled
-            end_coors['RIGHT'] = end_coor
+        scores = {}
+        snow_collection = {}
+        distances = {}
+        end_coors = {}
+        for i in self.available_directions:
+            if "DOWN" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=0, inc_y=1, coors=snowflake_coors)
+            elif "UP" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=0, inc_y=-1, coors=snowflake_coors)
+            elif "LEFT" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=-1, inc_y=0, coors=snowflake_coors)
+            elif "RIGHT" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=1, inc_y=0, coors=snowflake_coors)
+            else:
+                print('ERROR --- NO AVAILABLE DIRECTIONS TO MOVE')
+                score, snow_collected, distance_travelled, end_coor = 0, 0, 0, [0, 0]
+            scores[i] = score
+            snow_collection[i] = snow_collected
+            distances[i] = distance_travelled
+            end_coors[i] = end_coor
 
         direction = max(scores, key=scores.get)
         # Check if this move collects any snow, if it does not just move 1 cell in the direction selected above.
@@ -157,52 +141,49 @@ class Snowplow:
         print('-----------------------------------------------------------')
         return direction, num_of_moves
 
-    def greedy_movement(self, next_direction):
-        if next_direction == "DOWN":
+    def greedy_movement(self, direction):
+        if direction == "DOWN":
             self.y += HCV.MOVE_Y
             self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
             self.last_move = "DOWN"
-        elif next_direction == "UP":
+        elif direction == "UP":
             self.y -= HCV.MOVE_Y
             self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
             self.last_move = "UP"
-        elif next_direction == "LEFT":
+        elif direction == "LEFT":
             self.x -= HCV.MOVE_X
             self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
             self.last_move = "LEFT"
-        else:  # next_direction == "RIGHT"
+        elif direction == "RIGHT":
             self.x += HCV.MOVE_X
             self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
             self.last_move = "RIGHT"
+        else:
+            print('ERROR --- NO DIRECTION GIVEN')
 
     def get_coors_to_check(self):
         x = self.grid_x
         y = self.grid_y
         coors_to_check = {}
-        if "DOWN" in self.available_directions:
-            inc_x = 0
-            inc_y = 1
+        for i in self.available_directions:
+            if "DOWN" == i:
+                inc_x = 0
+                inc_y = 1
+            elif "UP" == i:
+                inc_x = 0
+                inc_y = -1
+            elif "LEFT" == i:
+                inc_x = -1
+                inc_y = 0
+            elif "RIGHT" == i:
+                inc_x = 1
+                inc_y = 0
+            else:
+                print('ERROR --- NO AVAILABLE DIRECTIONS TO MOVE')
+                inc_x, inc_y = 0, 0
             new_x = x + inc_x
             new_y = y + inc_y
-            coors_to_check["DOWN"] = [new_x, new_y]
-        if "UP" in self.available_directions:
-            inc_x = 0
-            inc_y = -1
-            new_x = x + inc_x
-            new_y = y + inc_y
-            coors_to_check["UP"] = [new_x, new_y]
-        if "LEFT" in self.available_directions:
-            inc_x = -1
-            inc_y = 0
-            new_x = x + inc_x
-            new_y = y + inc_y
-            coors_to_check["LEFT"] = [new_x, new_y]
-        if "RIGHT" in self.available_directions:
-            inc_x = 1
-            inc_y = 0
-            new_x = x + inc_x
-            new_y = y + inc_y
-            coors_to_check["RIGHT"] = [new_x, new_y]
+            coors_to_check[i] = [new_x, new_y]
         return coors_to_check
 
     def find_snow(self, coors_to_check, coors):
