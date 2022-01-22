@@ -1,6 +1,7 @@
 import pygame
 import HARD_CODED_VALUES as HCV
 import Barriers
+from scipy import spatial
 
 
 class Snowplow:
@@ -138,6 +139,10 @@ class Snowplow:
                 num_of_moves = 1
         print('Move:', direction, num_of_moves, ' spaces.')
         print('Scores:', scores)
+        tree = spatial.KDTree(self.snow_coors)
+        distance_to_snow, index = tree.query([self.grid_x, self.grid_y])
+        print('Current position:', self.grid_x, self.grid_y)
+        print('Closest snow flake:', self.snow_coors[index])
         print('-----------------------------------------------------------')
         print('-----------------------------------------------------------')
         return direction, num_of_moves

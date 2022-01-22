@@ -10,7 +10,7 @@ class Display:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((HCV.SCREEN_WIDTH, HCV.SCREEN_HEIGHT))
-        pygame.display.set_caption("Parking Lot Snow Removal Visualization")
+        pygame.display.set_caption("Snow Removal Visualization")
         icon = pygame.image.load('snowplow.png')
         pygame.display.set_icon(icon)
         self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
