@@ -13,8 +13,8 @@ class Snowpile:
         coor = [x, y]
         self.coors.append(coor)
 
-    def draw(self, arr):
-        for i in arr:
+    def draw(self):
+        for i in self.coors:
             coor = i
             # Convert grid coordinates to pixel coordinates
             pix_x = coor[0] * HCV.BLOCK_WIDTH

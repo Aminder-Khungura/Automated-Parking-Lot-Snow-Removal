@@ -71,8 +71,8 @@ class Snowflake:
 
         return self.parkinglot_coors
 
-    def draw(self, arr):
-        for i in arr:
+    def draw(self):
+        for i in self.snowflake_coors:
             coor = i
             # Convert grid coordinates to pixel coordinates
             self.pix_x = coor[0] * HCV.BLOCK_WIDTH
