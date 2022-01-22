@@ -49,13 +49,14 @@ class Display:
                     self.draw_background()
                     self.snowplow.draw(self.snowplow.x_start, self.snowplow.y_start)
                     self.remove_snow(self.snowplow.grid_x, self.snowplow.grid_y)
+                    self.snowplow.snow_coors = self.snowflake.snowflake_coors
 
                 # Move snowplow
                 if event.type == pygame.KEYDOWN:
                     print('Start pos:', self.snowplow.grid_x, self.snowplow.grid_y)
                     self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                     print('Available Directions:', self.snowplow.available_directions)
-                    direction, num_of_moves = self.snowplow.greedy_algorithm(self.snowflake.snowflake_coors)
+                    direction, num_of_moves = self.snowplow.greedy_algorithm()
                     for i in range(num_of_moves):
                         self.snowplow.greedy_movement(direction)
                         self.stats.distance_travelled += 1  # Update distance score
