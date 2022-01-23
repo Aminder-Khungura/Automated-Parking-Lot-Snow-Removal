@@ -40,31 +40,30 @@ class Display:
         running = True
         while running:
             for event in pygame.event.get():
+                # Quit -----------------------------------------------------------------------------------------------
                 if event.type == pygame.QUIT:
                     running = False
 
-                # Place snowplow at start location
+                # Place snowplow at start location -------------------------------------------------------------------
                 if event.type == pygame.MOUSEBUTTONDOWN and not self.snowplow.start_pos_set:
                     self.snowplow.get_start_pos()
                     self.draw_background()
                     self.snowplow.draw()
                     self.remove_snow()
-                    self.snowplow.snow_coors = self.snowflake.snowflake_coors
 
-                # Move snowplow
+                # Move snowplow --------------------------------------------------------------------------------------
                 if event.type == pygame.KEYDOWN:
                     self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
-                    direction, num_of_moves = self.snowplow.greedy_algorithm(self.snowflake.snowflake_coors)
+                    self.snowplow.snowflake_coors = self.snowflake.snowflake_coors
+                    direction, num_of_moves = self.snowplow.greedy_algorithm()
                     for i in range(num_of_moves):
                         self.snowplow.greedy_movement(direction)
                         self.stats.distance_travelled += 1  # Update distance score
-                        self.draw_background()
-                        self.snowplow.draw()
+                        self.remove_snow()  # Update amount removed score
                         collision = self.snowplow.detect_collision(self.snowplow.grid_x, self.snowplow.grid_y)
-
                         if collision:
                             self.stats.collisions += 1  # Update collision score
-                            # Check if the snowplow removed any snow before making the snowpile
+                            # Create snowpile
                             if self.stats.amount_removed > 0:
                                 self.stats.total_removed += self.stats.amount_removed
                                 self.snowpile.add_coor(self.snowplow.grid_x, self.snowplow.grid_y)
@@ -72,18 +71,15 @@ class Display:
                             self.draw_background()
                             self.snowplow.draw()
                             self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
-
+                        self.stats.snowpiles = len(self.snowpile.coors)  # Update snowpile score
                         # Update display
-                        self.remove_snow()
+                        self.draw_background()
+                        self.snowplow.draw()
                         self.snowflake.draw()
                         self.snowpile.draw()
-
-                        # Update snowpile score
-                        self.stats.snowpiles = len(self.snowpile.coors)
                         self.stats.display_info(self.font)
 
-                # Refresh screen
-                self.snowplow.snow_coors = self.snowflake.snowflake_coors
+                # Set screen -----------------------------------------------------------------------------------------
                 self.snowflake.draw()
                 self.snowpile.draw()
                 self.draw_grid()

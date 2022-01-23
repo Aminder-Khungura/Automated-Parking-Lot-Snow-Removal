@@ -68,7 +68,6 @@ class Snowflake:
             coor = list(i)
             if coor in self.parkinglot_coors:
                 self.parkinglot_coors.remove(coor)
-
         return self.parkinglot_coors
 
     def draw(self):
