@@ -135,7 +135,6 @@ class Snowplow:
             direction = 'NONE'
             num_of_moves = 1
             snow_found = False
-        print('-----------------------------------------------------------')
         return direction, num_of_moves, snow_found
 
     def greedy_movement(self, next_direction):
