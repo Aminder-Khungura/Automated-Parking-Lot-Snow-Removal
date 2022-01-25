@@ -107,7 +107,8 @@ class Barriers:
         self.grid_parkingspot_coors_INT = np.unique(self.grid_parkingspot_coors_INT, axis=0)
         self.grid_entry_coors_INT = np.unique(self.grid_entry_coors_INT, axis=0)
 
-        # Delete these boundary location to improve snowplows performance
+        # Delete these boundary location to improve snowplows performance, can remove the need to do this by letting
+        # the snowplow have collision > 1 before ending loop_till_collision()
         self.grid_boundary_coors.remove('24 11')
         self.grid_boundary_coors.remove('21 18')
         self.grid_boundary_coors.remove('10 14')
