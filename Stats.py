@@ -17,7 +17,6 @@ class Stats:
         self.scoreboard = pygame.transform.scale(self.scoreboard, (HCV.SCOREBOARD_X_TRANSFORM, HCV.SCOREBOARD_Y_TRANSFORM))
         self.log = pygame.image.load('clipboard.png')
         self.log = pygame.transform.scale(self.log, (HCV.LOG_X_TRANSFORM, HCV.LOG_Y_TRANSFORM))
-        self.draw_log()
 
     def display_info(self):
         carry = self.score_font.render("Amount of Snow Moved: " + str(self.amount_removed), True, HCV.WHITE)

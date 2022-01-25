@@ -15,6 +15,7 @@ class Snowflake:
         self.barriers = Barriers.Barriers(self.parent_screen)
         self.parkinglot_coors = self.get_parkinglot_coors()
         self.snowflake_coors = self.parkinglot_coors[:]
+        #self.snowflake_coors.remove([23, 11])
 
     def get_possible_coors(self):
         array_index = 0

@@ -107,6 +107,23 @@ class Barriers:
         self.grid_parkingspot_coors_INT = np.unique(self.grid_parkingspot_coors_INT, axis=0)
         self.grid_entry_coors_INT = np.unique(self.grid_entry_coors_INT, axis=0)
 
+        # Delete these boundary location to improve snowplows performance
+        self.grid_boundary_coors.remove('24 11')
+        self.grid_boundary_coors.remove('21 18')
+        self.grid_boundary_coors.remove('10 14')
+        self.grid_boundary_coors.remove('25 4')
+        self.grid_boundary_coors.remove('37 10')
+        self.grid_boundary_coors.remove('29 42')
+        self.grid_boundary_coors.remove('26 39')
+        temp = np.delete(self.grid_boundary_coors_INT, 16, 0)
+        temp_2 = np.delete(temp, 75, 0)
+        temp_3 = np.delete(temp_2, 93, 0)
+        temp_4 = np.delete(temp_3, 99, 0)
+        temp_5 = np.delete(temp_4, 113, 0)
+        temp_6 = np.delete(temp_5, 139, 0)
+        temp_7 = np.delete(temp_6, 208, 0)
+        self.grid_boundary_coors_INT = temp_7
+
         self.maze = np.array([[0] * 50] * 50)
         for i in self.grid_boundary_coors_INT:
             row = i[0]
