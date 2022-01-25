@@ -104,8 +104,8 @@ class Barriers:
         self.grid_parkingspot_coors = list(dict.fromkeys(self.grid_parkingspot_coors))
         self.grid_entry_coors = list(dict.fromkeys(self.grid_entry_coors))
         self.grid_boundary_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
-        self.grid_parkingspot_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
-        self.grid_entry_coors_INT = np.unique(self.grid_boundary_coors_INT, axis=0)
+        self.grid_parkingspot_coors_INT = np.unique(self.grid_parkingspot_coors_INT, axis=0)
+        self.grid_entry_coors_INT = np.unique(self.grid_entry_coors_INT, axis=0)
 
         self.maze = np.array([[0] * 50] * 50)
         for i in self.grid_boundary_coors_INT:

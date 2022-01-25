@@ -75,34 +75,38 @@ class Display:
                                 self.snowplow.draw()
                                 self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                             self.stats.snowpiles = len(self.snowpile.coors)  # Update snowpile score
-                            # Update display
-                            self.draw_background()
-                            self.snowplow.draw()
-                            self.snowflake.draw()
-                            self.snowpile.draw()
-                            self.stats.display_info(self.font)
                     else:
                         num_of_moves = self.snowplow.reposition()
-                        self.stats.distance_travelled += num_of_moves  # Update distance score
-                        self.remove_snow()  # Update amount removed score
-                        collision = self.snowplow.detect_collision(self.snowplow.grid_x, self.snowplow.grid_y)
-                        if collision:
-                            self.stats.collisions += 1  # Update collision score
-                            # Create snowpile
-                            if self.stats.amount_removed > 0:
-                                self.stats.total_removed += self.stats.amount_removed
-                                self.snowpile.add_coor(self.snowplow.grid_x, self.snowplow.grid_y)
-                                self.stats.amount_removed = 0
+                        if num_of_moves > 0:
+                            self.stats.distance_travelled += num_of_moves  # Update distance score
+                            self.remove_snow()  # Update amount removed score
+                            collision = self.snowplow.detect_collision(self.snowplow.grid_x, self.snowplow.grid_y)
+                            if collision:
+                                self.stats.collisions += 1  # Update collision score
+                                # Create snowpile
+                                if self.stats.amount_removed > 0:
+                                    self.stats.total_removed += self.stats.amount_removed
+                                    self.snowpile.add_coor(self.snowplow.grid_x, self.snowplow.grid_y)
+                                    self.stats.amount_removed = 0
+                                self.draw_background()
+                                self.snowplow.draw()
+                                self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
+                            self.stats.snowpiles = len(self.snowpile.coors)  # Update snowpile score
+                        else:
+                            closest_snow_flake = self.snowplow.get_closest_snow()
+                            self.snowplow.grid_x = closest_snow_flake[0]
+                            self.snowplow.grid_y = closest_snow_flake[1]
+                            self.snowplow.x = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT) - HCV.SNOWPLOW_IMG_OFFSET
+                            self.snowplow.y = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT) - HCV.SNOWPLOW_IMG_OFFSET
                             self.draw_background()
                             self.snowplow.draw()
                             self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
-                        self.stats.snowpiles = len(self.snowpile.coors)  # Update snowpile score
-                        # Update display
-                        self.draw_background()
-                        self.snowplow.draw()
-                        self.snowflake.draw()
-                        self.snowpile.draw()
-                        self.stats.display_info(self.font)
+                    # Update display
+                    self.draw_background()
+                    self.snowplow.draw()
+                    self.snowflake.draw()
+                    self.snowpile.draw()
+                    self.stats.display_info(self.font)
 
                 # Set screen -----------------------------------------------------------------------------------------
                 self.snowflake.draw()
