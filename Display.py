@@ -19,7 +19,6 @@ class Display:
         self.snowflake = Snowflake.Snowflake(self.screen)
         self.snowpile = Snowpile.Snowpile(self.screen)
         self.stats = Stats.Stats(self.screen)
-        self.font = pygame.font.SysFont('Corbel', 28)
 
     def draw_background(self):
         self.screen.blit(self.background_image, [0, 0])
@@ -55,10 +54,12 @@ class Display:
                 if event.type == pygame.KEYDOWN:
                     self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                     self.snowplow.snowflake_coors = self.snowflake.snowflake_coors
-                    print('Coors:', self.snowplow.grid_x, self.snowplow.grid_y)
-                    print('available_directions', self.snowplow.available_directions)
+                    string_1 = str('- Coordinate: ' + '[' + str(self.snowplow.grid_x) + ',' + str(self.snowplow.grid_y) + ']')
+                    string_2 = str('- Available Directions: ' + str(self.snowplow.available_directions))
                     direction, num_of_moves, snow_found = self.snowplow.greedy_algorithm()
                     if snow_found:
+                        string_3 = str('- Move ' + str(direction) + ' ' + str(num_of_moves) + ' spaces.')
+                        string_4 = str('')
                         for i in range(num_of_moves):
                             self.snowplow.greedy_movement(direction)
                             self.stats.distance_travelled += 1  # Update distance score
@@ -76,6 +77,9 @@ class Display:
                                 self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                             self.stats.snowpiles = len(self.snowpile.coors)  # Update snowpile score
                     else:
+                        string_3 = str('- NO SNOW AVAILABLE @ ' + '[' + str(self.snowplow.grid_x) + ',' + str(self.snowplow.grid_y) + ']')
+                        end_coor = self.snowplow.get_closest_snow()
+                        string_4 = str('- REPOSITION TO ' + str(end_coor) + ' VIA A* PATHFINDING.')
                         num_of_moves = self.snowplow.reposition()
                         if num_of_moves > 0:
                             self.stats.distance_travelled += num_of_moves  # Update distance score
@@ -92,7 +96,7 @@ class Display:
                                 self.snowplow.draw()
                                 self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                             self.stats.snowpiles = len(self.snowpile.coors)  # Update snowpile score
-                        else:
+                        else:  # Done as a temporary solution to escape and move snowplow when its gets stuck in ASTAR
                             closest_snow_flake = self.snowplow.get_closest_snow()
                             self.snowplow.grid_x = closest_snow_flake[0]
                             self.snowplow.grid_y = closest_snow_flake[1]
@@ -105,11 +109,12 @@ class Display:
                     self.draw_background()
                     self.snowplow.draw()
                     self.snowflake.draw()
-                    self.snowpile.draw()
-                    self.stats.display_info(self.font)
+                    # self.snowpile.draw()
+                    self.stats.display_info()
+                    self.stats.write_log(string_1, string_2, string_3, string_4)
 
                 # Set screen -----------------------------------------------------------------------------------------
                 self.snowflake.draw()
                 self.snowpile.draw()
-                self.draw_grid()
+                # self.draw_grid()
                 pygame.display.update()

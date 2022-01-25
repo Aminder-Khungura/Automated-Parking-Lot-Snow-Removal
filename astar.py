@@ -2,8 +2,8 @@
 
 def pathfinding(maze, start, end):
     # Create start and end node
-    start_node = NODE(None, start)
-    end_node = NODE(None, end)
+    start_node = NODE(parent=None, position=start)
+    end_node = NODE(parent=None, position=end)
     start_node.g = start_node.h = start_node.f = 0
     end_node.g = end_node.h = end_node.f = 0
     # Initialize both open and closed list
@@ -11,6 +11,7 @@ def pathfinding(maze, start, end):
     closed_list = []
     # Add the start node
     open_list.append(start_node)
+    loop_counter = 0
 
     # Loop until you find the end
     while len(open_list) > 0:
@@ -46,7 +47,7 @@ def pathfinding(maze, start, end):
             if maze[node_position[0]][node_position[1]] != 0:
                 continue
             # Create new node
-            new_node = NODE(current_node, node_position)
+            new_node = NODE(parent=current_node, position=node_position)
             # Append
             children.append(new_node)
 
@@ -67,6 +68,12 @@ def pathfinding(maze, start, end):
             # Add the child to the open list
             open_list.append(child)
 
+        loop_counter += 1
+        if loop_counter > 100:
+            path = []
+            print('ASTAR FAILED --------------------------------------------------------------------------------')
+            return path
+
 
 class NODE:
     def __init__(self, parent=None, position=None):
@@ -78,4 +85,3 @@ class NODE:
 
     def __eq__(self, other):
         return self.position == other.position
-

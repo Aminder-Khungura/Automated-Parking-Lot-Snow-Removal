@@ -130,7 +130,6 @@ class Snowplow:
         if snow_collection[direction] > 0:
             snow_found = True
             num_of_moves = distances[direction]
-            print('Move:', direction, num_of_moves, ' spaces.')
         else:
             direction = 'NONE'
             num_of_moves = 1
@@ -165,12 +164,9 @@ class Snowplow:
         return closest_snow_flake
 
     def reposition(self):
-        print('There is No snow available at this position.')
         start_coor = (self.grid_x, self.grid_y)
         end_coor = self.get_closest_snow()
-        print('Start:', start_coor, 'End:', end_coor)
         path = pathfinding(self.barriers.maze, start_coor, end_coor)
-        print('Path:', path)
         direction = 'NONE'
         for loc in path[1:]:
             new_x = loc[0]
