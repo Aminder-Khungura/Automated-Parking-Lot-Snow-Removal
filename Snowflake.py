@@ -1,6 +1,7 @@
 import pygame
 import HARD_CODED_VALUES as HCV
 import Barriers
+import numpy as np
 
 
 class Snowflake:
@@ -15,7 +16,8 @@ class Snowflake:
         self.barriers = Barriers.Barriers(self.parent_screen)
         self.parkinglot_coors = self.get_parkinglot_coors()
         self.snowflake_coors = self.parkinglot_coors[:]
-        #self.snowflake_coors.remove([23, 11])
+        self.maze = np.array([[1] * 50] * 50)
+        self.maze = self.draw_maze()
 
     def get_possible_coors(self):
         array_index = 0
@@ -70,6 +72,13 @@ class Snowflake:
             if coor in self.parkinglot_coors:
                 self.parkinglot_coors.remove(coor)
         return self.parkinglot_coors
+
+    def draw_maze(self):
+        for i in self.parkinglot_coors:
+            row = i[0]
+            col = i[1]
+            self.maze[row][col] = 0
+        return self.maze
 
     def draw(self):
         for i in self.snowflake_coors:

@@ -13,7 +13,7 @@ class Display:
         pygame.display.set_caption("Snow Removal Visualization")
         icon = pygame.image.load('snowplow icon.png')
         pygame.display.set_icon(icon)
-        self.background_image = pygame.image.load('Edited Parking Lot.jpg').convert()
+        self.background_image = pygame.image.load('Labelled Parking Lot.jpg').convert()
         self.screen.blit(self.background_image, [0, 0])
         self.snowplow = Snowplow.Snowplow(self.screen)
         self.snowflake = Snowflake.Snowflake(self.screen)
@@ -81,6 +81,7 @@ class Display:
                         end_coor = self.snowplow.get_closest_snow()
                         string_4 = str('- REPOSITION TO ' + str(end_coor) + ' VIA A* PATHFINDING.')
                         num_of_moves = self.snowplow.reposition()
+                        self.remove_snow()
                         if num_of_moves > 0:
                             self.stats.distance_travelled += num_of_moves  # Update distance score
                             self.remove_snow()  # Update amount removed score
@@ -100,10 +101,11 @@ class Display:
                             closest_snow_flake = self.snowplow.get_closest_snow()
                             self.snowplow.grid_x = closest_snow_flake[0]
                             self.snowplow.grid_y = closest_snow_flake[1]
-                            self.snowplow.x = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT) - HCV.SNOWPLOW_IMG_OFFSET
-                            self.snowplow.y = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT) - HCV.SNOWPLOW_IMG_OFFSET
+                            self.snowplow.x = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT)
+                            self.snowplow.y = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT)
                             self.draw_background()
                             self.snowplow.draw()
+                            self.remove_snow()
                             self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                     # Update display
                     self.draw_background()

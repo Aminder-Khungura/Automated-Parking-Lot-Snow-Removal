@@ -5,7 +5,7 @@ import HARD_CODED_VALUES as HCV
 class Snowpile:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
-        self.character = pygame.image.load('snowpile.png').convert_alpha()
+        self.character = pygame.image.load('snowpile (tilt).png').convert_alpha()
         self.character = pygame.transform.scale(self.character, (HCV.Snowpile_X_TRANSFORM, HCV.Snowpile_Y_TRANSFORM))
         self.coors = []
 

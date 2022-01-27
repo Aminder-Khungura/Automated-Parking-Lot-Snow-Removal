@@ -124,13 +124,3 @@ class Barriers:
         temp_6 = np.delete(temp_5, 139, 0)
         temp_7 = np.delete(temp_6, 208, 0)
         self.grid_boundary_coors_INT = temp_7
-
-        self.maze = np.array([[0] * 50] * 50)
-        for i in self.grid_boundary_coors_INT:
-            row = i[0]
-            col = i[1]
-            self.maze[row][col] = 1
-        for i in self.grid_entry_coors_INT:
-            row = i[0]
-            col = i[1]
-            self.maze[row][col] = 1

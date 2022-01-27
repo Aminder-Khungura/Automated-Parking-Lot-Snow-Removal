@@ -1,6 +1,7 @@
 import pygame
 import HARD_CODED_VALUES as HCV
 import Barriers
+import Snowflake
 from ASTAR import pathfinding
 from scipy import spatial
 
@@ -21,9 +22,10 @@ class Snowplow:
         self.grid_x = 0
         self.grid_y = 0
         self.start_pos_set = False
-        self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
+        self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT", "DOWN/LEFT", "DOWN/RIGHT", "UP/LEFT", "UP/RIGHT"]
         self.last_move = 'NONE'
         self.snowflake_coors = [[]]
+        self.snowflake = Snowflake.Snowflake(self.parent_screen)
 
     def get_start_pos(self):
         self.x, self.y = pygame.mouse.get_pos()
@@ -50,7 +52,7 @@ class Snowplow:
         return self.collision
 
     def get_available_directions(self, grid_x, grid_y):
-        self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT"]
+        self.available_directions = ["DOWN", "UP", "LEFT", "RIGHT", "DOWN/LEFT", "DOWN/RIGHT", "UP/LEFT", "UP/RIGHT"]
         # Remove the last movement direction from list of available moves, so snowplow doesnt continue into barrier
         if self.last_move in self.available_directions and self.collision:
             self.available_directions.remove(self.last_move)
@@ -68,6 +70,18 @@ class Snowplow:
             elif "RIGHT" == i:
                 x = grid_x + 1
                 y = grid_y
+            elif "DOWN/LEFT" == i:
+                x = grid_x - 1
+                y = grid_y + 1
+            elif "DOWN/RIGHT" == i:
+                x = grid_x + 1
+                y = grid_y + 1
+            elif "UP/LEFT" == i:
+                x = grid_x - 1
+                y = grid_y - 1
+            elif "UP/RIGHT" == i:
+                x = grid_x + 1
+                y = grid_y - 1
             else:
                 print('ERROR --- NO AVAILABLE DIRECTIONS TO MOVE')
                 x, y = 0, 0
@@ -80,7 +94,7 @@ class Snowplow:
         x, y = self.grid_x,  self.grid_y
         coor = [x, y]
         snow_collected = 0
-        snow_collection_point_multiplier = 12
+        snow_collection_point_multiplier = 2
         distance_travelled = 0
         collision = False
         loop_counter = 0
@@ -118,6 +132,14 @@ class Snowplow:
                 score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=-1, inc_y=0)
             elif "RIGHT" == i:
                 score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=1, inc_y=0)
+            elif "DOWN/LEFT" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=-1, inc_y=1)
+            elif "DOWN/RIGHT" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=1, inc_y=1)
+            elif "UP/LEFT" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=-1, inc_y=-1)
+            elif "UP/RIGHT" == i:
+                score, snow_collected, distance_travelled, end_coor = self.loop_till_collision(inc_x=1, inc_y=-1)
             else:
                 print('ERROR --- NO AVAILABLE DIRECTIONS TO MOVE')
                 score, snow_collected, distance_travelled, end_coor = 0, 0, 0, [0, 0]
@@ -153,6 +175,30 @@ class Snowplow:
             self.x += HCV.MOVE_X
             self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
             self.last_move = "RIGHT"
+        elif next_direction == "DOWN/LEFT":
+            self.x -= HCV.MOVE_X
+            self.y += HCV.MOVE_Y
+            self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.last_move = "DOWN/LEFT"
+        elif next_direction == "DOWN/RIGHT":
+            self.x += HCV.MOVE_X
+            self.y += HCV.MOVE_Y
+            self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.last_move = "DOWN/RIGHT"
+        elif next_direction == "UP/LEFT":
+            self.x -= HCV.MOVE_X
+            self.y -= HCV.MOVE_Y
+            self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.last_move = "UP/LEFT"
+        elif next_direction == "UP/RIGHT":
+            self.x += HCV.MOVE_X
+            self.y -= HCV.MOVE_Y
+            self.grid_x = (self.x + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_WIDTH
+            self.grid_y = (self.y + HCV.SNOWPLOW_IMG_OFFSET) // HCV.BLOCK_HEIGHT
+            self.last_move = "UP/RIGHT"
         else:
             print('ERROR --- NO DIRECTIONS GIVEN')
 
@@ -166,19 +212,27 @@ class Snowplow:
     def reposition(self):
         start_coor = (self.grid_x, self.grid_y)
         end_coor = self.get_closest_snow()
-        path = pathfinding(self.barriers.maze, start_coor, end_coor)
+        path = pathfinding(self.snowflake.maze, start_coor, end_coor)
         direction = 'NONE'
         for loc in path[1:]:
             new_x = loc[0]
             new_y = loc[1]
-            if new_x - self.grid_x < 0:
+            if new_x < self.grid_x and new_y == self.grid_y:
                 direction = 'LEFT'
-            elif new_x - self.grid_x > 0:
+            elif new_x > self.grid_x and new_y == self.grid_y:
                 direction = 'RIGHT'
-            elif new_y - self.grid_y < 0:
+            elif new_y < self.grid_y and new_x == self.grid_x:
                 direction = 'UP'
-            elif new_y - self.grid_y > 0:
+            elif new_y > self.grid_y and new_x == self.grid_x:
                 direction = 'DOWN'
+            elif new_x < self.grid_x and new_y > self.grid_y:
+                direction = 'DOWN/LEFT'
+            elif new_x > self.grid_x and new_y > self.grid_y:
+                direction = 'DOWN/RIGHT'
+            elif new_y < self.grid_y and new_x < self.grid_x:
+                direction = 'UP/LEFT'
+            elif new_y < self.grid_y and new_x > self.grid_x:
+                direction = 'UP/RIGHT'
             else:
                 print("ERROR --- CAN'T DETERMINE DIRECTION")
             self.greedy_movement(direction)
