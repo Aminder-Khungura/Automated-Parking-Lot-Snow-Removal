@@ -51,7 +51,7 @@ class Display:
                     self.remove_snow()
 
                 # Move snowplow --------------------------------------------------------------------------------------
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.KEYDOWN and self.snowplow.start_pos_set:
                     self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                     self.snowplow.snowflake_coors = self.snowflake.snowflake_coors
                     string_1 = str('- Coordinate: ' + '[' + str(self.snowplow.grid_x) + ',' + str(self.snowplow.grid_y) + ']')
@@ -103,9 +103,11 @@ class Display:
                             self.snowplow.grid_y = closest_snow_flake[1]
                             self.snowplow.x = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT)
                             self.snowplow.y = (self.snowplow.grid_x * HCV.BLOCK_HEIGHT)
+                            self.remove_snow()
+                            self.stats.total_removed += self.stats.amount_removed
+                            self.stats.amount_removed = 0
                             self.draw_background()
                             self.snowplow.draw()
-                            self.remove_snow()
                             self.snowplow.get_available_directions(self.snowplow.grid_x, self.snowplow.grid_y)
                     # Update display
                     self.draw_background()
@@ -114,6 +116,13 @@ class Display:
                     # self.snowpile.draw()
                     self.stats.display_info()
                     self.stats.write_log(string_1, string_2, string_3, string_4)
+
+                # Place snowplow at second location -------------------------------------------------------------------
+                if event.type == pygame.MOUSEBUTTONDOWN and self.snowplow.start_pos_set:
+                    self.snowplow.get_start_pos()
+                    self.draw_background()
+                    self.snowplow.draw()
+                    self.remove_snow()
 
                 # Set screen -----------------------------------------------------------------------------------------
                 self.snowflake.draw()
