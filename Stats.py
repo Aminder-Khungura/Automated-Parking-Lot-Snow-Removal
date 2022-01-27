@@ -13,10 +13,8 @@ class Stats:
         self.score_font = pygame.font.SysFont('Corbel', HCV.FONT_SIZE)
         self.log_title_font = pygame.font.SysFont('arial', HCV.LOG_TITLE_SIZE)
         self.log_font = pygame.font.SysFont('arial', HCV.LOG_FONT_SIZE)
-        # self.scoreboard = pygame.image.load('board.png')
-        # self.scoreboard = pygame.transform.scale(self.scoreboard, (HCV.SCOREBOARD_X_TRANSFORM, HCV.SCOREBOARD_Y_TRANSFORM))
-        self.log = pygame.image.load('clipboard.png')
-        self.log = pygame.transform.scale(self.log, (HCV.LOG_X_TRANSFORM, HCV.LOG_Y_TRANSFORM))
+        self.legend = pygame.image.load('legend.jpg')
+        self.legend = pygame.transform.scale(self.legend, (HCV.LEGEND_X_TRANSFORM, HCV.LEGEND_Y_TRANSFORM))
 
     def display_info(self):
         carry = self.score_font.render("Amount of Snow Moved: " + str(self.amount_removed), True, HCV.WHITE, HCV.BLACK)
@@ -24,23 +22,19 @@ class Stats:
         distance = self.score_font.render("Distance Travelled: " + str(self.distance_travelled), True, HCV.WHITE, HCV.BLACK)
         collision = self.score_font.render("Collisions: " + str(self.collisions), True, HCV.WHITE, HCV.BLACK)
         snowpile = self.score_font.render("Snowpiles: " + str(self.snowpiles), True, HCV.WHITE, HCV.BLACK)
-        # self.parent_screen.blit(self.scoreboard, [HCV.SCOREBOARD_X, HCV.SCOREBOARD_Y])
-        self.parent_screen.blit(self.log, [HCV.LOG_X, HCV.LOG_Y])
         self.parent_screen.blit(carry, (HCV.CARRY_X, HCV.CARRY_Y))
         self.parent_screen.blit(score, (HCV.SCORE_X, HCV.SCORE_Y))
         self.parent_screen.blit(distance, (HCV.DISTANCE_X, HCV.DISTANCE_Y))
         self.parent_screen.blit(collision, (HCV.COLLISION_X, HCV.COLLISION_Y))
         self.parent_screen.blit(snowpile, (HCV.SNOWPILE_X, HCV.SNOWPILE_Y))
-
-    def draw_log(self):
-        self.parent_screen.blit(self.log, [HCV.LOG_X, HCV.LOG_Y])
+        self.parent_screen.blit(self.legend, [HCV.LEGEND_X, HCV.LEGEND_Y])
 
     def write_log(self, string_1, string_2, string_3, string_4):
-        title = self.log_title_font.render('MOVEMENT LOG', True, HCV.BLACK)
-        coor = self.log_font.render(string_1, True, HCV.BLACK)
-        available_directions = self.log_font.render(string_2, True, HCV.BLACK)
-        move = self.log_font.render(string_3, True, HCV.BLACK)
-        finish = self.log_font.render(string_4, True, HCV.BLACK)
+        title = self.log_title_font.render('MOVEMENT LOG', True, HCV.WHITE, HCV.BLACK)
+        coor = self.log_font.render(string_1, True, HCV.WHITE, HCV.BLACK)
+        available_directions = self.log_font.render(string_2, True, HCV.WHITE, HCV.BLACK)
+        move = self.log_font.render(string_3, True, HCV.WHITE, HCV.BLACK)
+        finish = self.log_font.render(string_4, True, HCV.WHITE, HCV.BLACK)
         self.parent_screen.blit(title, (HCV.LOG_TITLE_X, HCV.LOG_TITLE_Y))
         self.parent_screen.blit(coor, (HCV.LOG_COOR_X, HCV.LOG_COOR_Y))
         self.parent_screen.blit(available_directions, (HCV.LOG_AVAILABLE_DIRECTIONS_X, HCV.LOG_AVAILABLE_DIRECTIONS_Y))
